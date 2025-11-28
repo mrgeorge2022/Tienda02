@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando...</title>
+    <link rel="icon" type="image/png" href="">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #000000;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        h1,
+        h2 {
+            color: #000000;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Términos y Condiciones de Uso</h1>
+
+    <p></p><strong>¡Bienvenido a mi tienda!</strong> Somos un emprendimiento dedicado a ofrecer productos de calidad y a brindar una
+        experiencia de compra confiable y segura. Al utilizar nuestra página web, aceptas y estás de acuerdo con estos
+        términos y condiciones, por lo que te pedimos que leas detenidamente esta información.</p>
+
+    <h2>1. Privacidad y Protección de Datos</h2>
+
+    <p><strong>Respeto a la Privacidad:</strong> En <strong>mi tienda</strong> valoramos la confianza que depositas en
+        nosotros y nos comprometemos a respetar la privacidad de cada usuario. No recopilamos ni almacenamos datos
+        personales sin tu consentimiento explícito. Al navegar en nuestra página, puedes estar seguro de que no
+        guardaremos información identificable a menos que tú decidas proporcionarla de forma voluntaria.</p>
+
+    <p><strong>Uso Responsable de Información:</strong> La información que decidas compartir con nosotros será utilizada
+        exclusivamente para mejorar tu experiencia de compra, como el procesamiento de pedidos o el envío de productos.
+        No compartimos, vendemos ni intercambiamos datos personales de nuestros usuarios con terceros, a menos que sea
+        requerido por ley o necesario para prestar los servicios que solicites.</p>
+
+    <p><strong>Cookies y Tecnología Similar:</strong> Para mejorar nuestra página, utilizamos cookies que no almacenan
+        información personal sensible. Puedes configurar tu navegador para rechazar cookies, aunque esto puede afectar
+        el funcionamiento de ciertas características del sitio.</p>
+
+    <h2>2. Seguridad del Usuario</h2>
+
+    <p><strong>Protección de la Información:</strong> Nos esforzamos por garantizar la seguridad de la información y
+        protegerla contra accesos no autorizados. Implementamos medidas de seguridad tanto técnicas como organizativas,
+        con el fin de brindar una experiencia de navegación segura en nuestra página.</p>
+
+    <p><strong>Exclusión de Responsabilidad por Vulnerabilidades de Dispositivos:</strong> Aunque <strong>mi tienda</strong> implementa mecanismos de seguridad, la seguridad de tu dispositivo depende también de ti. Te
+        recomendamos que mantengas actualizado el software de tu dispositivo y tomes las precauciones adecuadas para
+        evitar posibles vulnerabilidades.</p>
+
+    <h2>3. Uso de la Página Web</h2>
+
+    <p><strong>Propiedad Intelectual:</strong> Todos los contenidos, imágenes, textos y gráficos de esta página son
+        propiedad de <strong>mi tienda</strong> o se encuentran bajo licencias que permiten su uso. Queda prohibida la
+        reproducción, distribución o modificación sin autorización expresa.</p>
+
+    <p><strong>Acceso y Navegación Responsable:</strong> El uso de nuestra página web debe ser únicamente para fines
+        legales y personales. No se permite el uso de bots, técnicas de extracción masiva de datos, o cualquier otra
+        actividad que interfiera con el funcionamiento de nuestra web.</p>
+
+    <p><strong>Condiciones de Compra:</strong> Al realizar una compra en <strong>mi tienda</strong>, el cliente acepta
+        proporcionar información completa y veraz. Nos reservamos el derecho de rechazar pedidos si identificamos
+        actividad sospechosa, abusiva o fraudulenta.</p>
+
+    <h2>4. Exclusión de Responsabilidad</h2>
+
+    <p><strong>Disponibilidad del Servicio:</strong> En <strong>mi tienda</strong>, buscamos que nuestro sitio esté
+        siempre disponible. Sin embargo, no garantizamos su funcionamiento ininterrumpido y nos reservamos el derecho a
+        suspender temporalmente el servicio por mantenimiento o por causas ajenas a nuestro control.</p>
+
+    <p><strong>Limitación de Responsabilidad:</strong> <strong>mi tienda</strong> no se hace responsable por posibles
+        daños o pérdidas derivadas del uso del sitio web, como errores en el funcionamiento, pérdida de datos o
+        interrupciones. Aceptas el uso de este sitio bajo tu propio riesgo.</p>
+
+    <h2>5. Modificaciones y Actualizaciones</h2>
+
+    <p><strong>Cambios en los Términos:</strong> <strong>mi tienda</strong> se reserva el derecho de modificar estos
+        términos y condiciones en cualquier momento. En caso de cambios significativos, actualizaremos esta página y,
+        cuando sea posible, te notificaremos a través de otros medios.</p>
+
+    <h2>6. Contacto y Soporte</h2>
+
+    <p>Si tienes dudas sobre nuestros términos, o deseas más información, puedes contactarnos a través de nuestro
+        formulario de contacto en la página. En <strong>mi tienda</strong>, estamos aquí para ayudarte y resolver
+        cualquier inquietud.</p>
+
+    <p>Gracias por confiar en <strong>mi tienda</strong>. Nos esforzamos cada día por ofrecer una experiencia de compra
+        segura y satisfactoria.</p>
+
+</body>
+    <script src="config-loader.js"></script>
+
+<script>
+document.addEventListener("configCargado", (event) => {
+  const config = event.detail;
+  const nombreTienda = config.nombreRestaurante || "Mi Tienda";
+
+  // Cambiar el título de la pestaña
+  document.title = `Terminos y condiciones | ${nombreTienda}`;
+
+  // Reemplazar "mi tienda" por el nombre real dentro del contenido
+  document.body.innerHTML = document.body.innerHTML.replace(/mi tienda/gi, nombreTienda);
+});
+</script>
+
+
+</html>

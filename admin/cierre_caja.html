@@ -1,0 +1,1616 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Caja</title>
+      <link rel="icon" type="image/png" href="../img/icono_tienda.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        /* ================================
+       VARIABLES / RESET
+       ================================ */
+        :root {
+            --primary: #5bc0de;
+            --accent: #46b8da;
+            --muted: #909ba7;
+            --success: #63d471;
+            --warning: #f8c050;
+            --danger: #ff6b6b;
+            --bg: #1e1e2d;
+            --card: #2b2b3f;
+            --line: #4a4a68;
+            --text: #f1f1f1;
+            --input: #3c3c58;
+            --domicilio: #ff9933;
+            --radius: 12px;
+            --glass: rgba(255, 255, 255, 0.03);
+            --max-width: 1200px;
+            --shadow-1: 0 6px 20px rgba(0, 0, 0, 0.45);
+            font-size: 16px;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        html,
+        body {
+            height: 100%
+        }
+
+        body {
+            margin: 0;
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+            background: #212133;
+            color: var(--text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            display: flex;
+            justify-content: center;
+            padding: 18px;
+        }
+
+        /* Contenedor central para facilitar reemplazo */
+        .app {
+            width: 100%;
+            max-width: var(--max-width);
+            display: flex;
+            gap: 24px;
+        }
+
+        /* ================================
+       SIDEBAR
+       ================================ */
+/* Footer del sidebar: pegado abajo */
+#sidebar {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#sidebar-footer {
+    margin-top: auto;
+    padding-top: 20px;
+}
+
+/* Botón elegante */
+.admin-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.05rem;
+    font-weight: 800;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    background: linear-gradient(135deg, #5bc0de, #2fa8c3);
+    color: #1a1a25;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+    transition: 0.2s ease-in-out;
+}
+
+.admin-btn:hover {
+    background: linear-gradient(135deg, #7bd9f0, #49c4dd);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.45);
+}
+
+/* Móvil → sidebar fijo deslizable */
+@media (max-width: 899px) {
+    #sidebar-footer {
+        padding-bottom: 20px;
+    }
+}
+
+
+        #sidebar h2 {
+            margin: 0 0 16px 0;
+            font-size: 1.15rem;
+            color: var(--primary);
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 12px;
+            font-weight: 800;
+        }
+
+        #sidebar nav {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px
+        }
+
+        #sidebar a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text);
+            text-decoration: none;
+            padding: 10px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background .18s, color .18s;
+        }
+
+        #sidebar a.active {
+            background: var(--primary);
+            color: var(--input);
+        }
+
+        #sidebar a:hover {
+            background: var(--input);
+            color: var(--primary)
+        }
+
+        /* ================================
+       MAIN CONTENT
+       ================================ */
+        .main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, var(--card), rgba(28, 28, 40, 0.9));
+            border-radius: var(--radius);
+            padding: 15px;
+            border: 1px solid var(--line);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+        }
+
+        h1 {
+            margin: 0 0 10px 0;
+            color: var(--primary);
+            font-size: 1.4rem
+        }
+
+        h2 {
+            margin: 0 0 12px 0;
+            font-size: 1rem;
+            color: var(--text);
+            font-weight: 700
+        }
+
+        /* Resumen superior */
+        .total-summary {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 18px;
+            border-radius: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+            color: var(--input);
+            font-weight: 800;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+        }
+
+        .total-summary .label {
+            font-size: 0.95rem
+        }
+
+        .total-summary .amount {
+            font-size: 1.6rem;
+            letter-spacing: 0.6px
+        }
+
+        .esperado-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .esperado-item {
+            background: var(--glass);
+            padding: 6px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid var(--line)
+        }
+
+        .esperado-item strong {
+            display: block;
+            color: var(--primary);
+            margin-top: 6px;
+            font-weight: 800
+        }
+
+        /* Inputs / grupo de conteo */
+        .metric-group {
+            margin-top: 6px
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed var(--line)
+        }
+
+        .input-row label {
+            flex: 1;
+            min-width: 150px;
+            font-weight: 700
+        }
+
+        .input-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: 320px;
+            max-width: 100%
+        }
+
+        input[type="number"],
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--line);
+            background: var(--input);
+            color: var(--text);
+            font-weight: 700;
+            text-align: left;
+            font-size: 1rem;
+            transition: box-shadow .14s, border-color .14s, background .14s;
+        }
+
+        textarea {
+            resize: vertical;
+            text-align: left;
+            padding: 12px
+        }
+
+        input:focus,
+        textarea:focus {
+            outline: none;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5);
+            border-color: var(--primary)
+        }
+
+        .diff-indicator {
+            min-width: 120px;
+            text-align: right;
+            font-weight: 800;
+            font-size: 0.95rem;
+            color: transparent;
+            transition: color .18s, opacity .18s;
+            opacity: 0;
+        }
+
+        /* Botón registrar */
+        .actions {
+            margin-top: 14px;
+            display: flex;
+            gap: 12px;
+            align-items: center
+        }
+
+        .btn {
+            padding: 12px 16px;
+            border-radius: 10px;
+            border: none;
+            font-weight: 800;
+            cursor: pointer;
+            background: var(--primary);
+            color: var(--input);
+            box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: .6;
+            cursor: not-allowed;
+            background: var(--line);
+            color: var(--muted);
+            width: 100%;
+        }
+
+        /* Diferencia total (solo mensaje resumido) */
+        #diferenciaTotal {
+            margin-top: 10px;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--line);
+            text-align: center;
+            font-weight: 800;
+            transition: background .18s, border-color .18s, color .18s;
+            background: transparent;
+            color: var(--muted);
+        }
+
+       /* Historial / producido tables */
+.producido-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+    background: var(--input);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.producido-table th,
+.producido-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+/* ENCABEZADOS CENTRADOS */
+.producido-table th {
+    background: var(--primary);
+    color: var(--input);
+    text-align: center;   /* 🔥 ENCABEZADOS CENTRADOS */
+    font-weight: 800;
+}
+
+/* PRIMERA COLUMNA IZQUIERDA */
+.producido-table td:first-child {
+    text-align: left;     /* 🔥 MÉTODO DE PAGO */
+    color: var(--primary);
+    font-weight: 700;
+}
+
+/* TODAS LAS DEMÁS COLUMNAS NUMÉRICAS A LA DERECHA */
+.producido-table td:not(:first-child) {
+    text-align: right;    /* 🔥 NÚMEROS DERECHA */
+}
+
+/* SUBTOTAL */
+.subtotal-row {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.02));
+    font-weight: 900;
+    color: var(--warning);
+}
+
+
+        /* ================================
+       QUITAR FLECHAS EN number inputs
+       ================================ */
+        /* Chrome, Edge, Safari */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        /* ================================
+       MOBILE: TOPBAR + SIDEBAR HIDDEN / SLIDE
+       ================================ */
+        #mobile-topbar {
+            display: none;
+            position: fixed;
+            left: 0;
+            right: 0;
+            top: 0;
+            /* 🔥 Pegada arriba */
+            height: 60px;
+            background: linear-gradient(90deg, #181822, #232332);
+            /* 🔥 Solo curva abajo */
+            padding: 10px 14px;
+            align-items: center;
+            gap: 12px;
+            z-index: 1200;
+        }
+
+
+        #mobile-topbar .menu-btn {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: transform .22s ease;
+        }
+
+        /* small screens */
+        @media (max-width: 899px) {
+            body {
+                padding: 12px
+            }
+
+            .app {
+                flex-direction: column
+            }
+#sidebar {
+    padding: 10px;
+    position: fixed;
+    left: 0;
+    top: 0;                     /* 🔥 Pegado completamente arriba */
+    height: 100vh;              /* 🔥 Ocupa toda la pantalla completa */
+    width: 100%;
+    background: #212133;
+    z-index: 1199;
+    transform: translateX(-110%);
+    overflow-y: auto;           /* Para que el usuario pueda hacer scroll si es muy largo */
+    box-shadow: 4px 0 20px rgba(0,0,0,0.6);
+}
+
+
+            #sidebar.active {
+                transform: translateX(0)
+            }
+
+            #mobile-topbar {
+                display: flex
+            }
+
+            .main {
+                margin-top: 72px
+            }
+
+            .input-right {
+                width: 100%;
+                flex-direction: row;
+                justify-content: space-between
+            }
+
+            .input-row label {
+                min-width: 120px
+            }
+        }
+
+        /* ancho pequeño para inputs */
+        @media (max-width:520px) {
+            .esperado-grid {
+                grid-template-columns: repeat(2, 1fr)
+            }
+
+            .input-row {
+                flex-direction: column;
+                align-items: flex-start
+            }
+
+            .input-right {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch
+            }
+
+            .main {
+                padding: 0
+            }
+        }
+
+        @media (max-width: 899px) {
+    .producido-group {
+        overflow-x: auto;      /* 🔥 Scroll horizontal */
+        -webkit-overflow-scrolling: touch; /* scroll suave en iPhone */
+        padding-bottom: 10px;  /* espacio para el scroll */
+    }
+
+    .producido-table {
+        min-width: 620px;      /* 🔥 Garantiza que haya scroll */
+    }
+}
+
+
+/*
+ * Versión 2.0 - Responsiva con Flexbox
+ * Comportamiento deseado:
+ * - Escritorio (> 768px): Layout horizontal (Label | Input | Botón)
+ * - Móvil (< 768px): Layout apilado (Label | Input | Botón)
+ */
+.fecha-cierre-container {
+    /* Por defecto, usamos flex para alinear horizontalmente y definir el espaciado */
+    display: flex;
+    gap: 10px;
+    align-items: center; /* Centra verticalmente todos los elementos */
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed var(--line);
+    
+    /* Nota: Usar display: flex; aquí asegura el layout de escritorio */
+}
+
+/* Ajustes para los elementos internos */
+.fecha-cierre-container label {
+    font-weight: 700;
+    white-space: nowrap;
+    /* En escritorio, el label toma solo el espacio que necesita */
+}
+
+.fecha-cierre-container input[type="date"] {
+    /* Permite que el input crezca para ocupar el espacio restante en escritorio */
+    flex-grow: 1; 
+    
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--line);
+    background: var(--input);
+    color: var(--text);
+}
+
+.fecha-cierre-container .btn-reload {
+    /* El botón no crece, solo toma el espacio de su contenido */
+    flex-shrink: 0;
+    
+    background: var(--success);
+    color: var(--input);
+    padding: 8px 12px;
+    font-weight: 700;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+/*
+ * MEDIA QUERY PARA MÓVILES
+ * Apila los elementos en pantallas pequeñas (ej: 768px o menos)
+ */
+@media (max-width: 768px) {
+    .fecha-cierre-container {
+        /* Fuerza a que los elementos se apilen verticalmente */
+        flex-direction: column;
+        align-items: stretch; /* Estira los elementos para que ocupen todo el ancho */
+        gap: 8px; /* Reduce un poco el espacio vertical entre elementos */
+    }
+    
+    /* Asegura que el botón ocupe todo el ancho en móvil */
+    .fecha-cierre-container .btn-reload {
+        width: 100%;
+    }
+}
+
+/* ================================================================= */
+/* 🔎 ESTILOS PARA LA BÚSQUEDA POR FECHA (CONSULTA HISTÓRICA) */
+/* ================================================================= */
+
+.consulta-fecha-controls {
+    display: flex;
+    gap: 15px; /* Aumento de gap para mejor espacio */
+    align-items: center;
+    border-radius: 8px;
+    /* Usar un color de fondo sutil si está en un panel */
+}
+
+.consulta-fecha-label {
+    font-weight: 700;
+    font-size: 1rem;
+    flex-shrink: 0; /* Evita que la etiqueta se comprima */
+}
+
+.consulta-fecha-input {
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 1rem;
+    /* Fondo oscuro y borde sutil */
+    background-color: var(--input);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    flex-grow: 1; /* Permite que el input se expanda un poco */
+    max-width: 200px; /* Ancho máximo estándar para un input de fecha */
+    transition: border-color 0.2s;
+}
+
+.consulta-fecha-input:focus {
+    outline: none;
+    border-color: var(--accent, #ffc400);
+}
+
+/* 🎨 Estilos Generales de Botón Reutilizables (Asegura consistencia) */
+
+/* Si ya tienes una clase .btn, solo necesitas definir las variantes. */
+.btn {
+    padding: 10px 18px;
+    border: none;
+    border-radius: 8px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 0.95rem;
+    transition: background-color 0.2s, opacity 0.2s;
+    color: var(--bg-start, #333); /* Texto oscuro sobre el botón */
+    flex-shrink: 0;
+}
+
+/* Variante principal (Buscar) */
+.btn-primary {
+    /* Usamos el color de éxito para la acción principal */
+    background-color: var(--success, #4caf50); 
+    color: #fff; /* Texto blanco en el botón de éxito */
+}
+
+.btn-primary:hover {
+    opacity: 0.9;
+}
+
+/* Variante secundaria (Ver todo) */
+.btn-secondary {
+    /* Usamos el color muted para la acción secundaria */
+    background-color: var(--muted, #9e9e9e); 
+    color: #fff;
+}
+
+.btn-secondary:hover {
+    opacity: 0.9;
+}
+
+
+/* 📱 Responsiveness (Apilar elementos en móvil) */
+@media (max-width: 600px) {
+    .consulta-fecha-controls {
+        flex-direction: column;
+        align-items: stretch; /* Estirar elementos al 100% */
+        gap: 10px;
+    }
+    
+    .consulta-fecha-label {
+        text-align: left;
+        margin-bottom: -5px; /* Ajuste para acercar la etiqueta al input */
+    }
+
+    .consulta-fecha-input {
+        max-width: 100%;
+    }
+}
+
+
+    </style>
+</head>
+
+<body>
+    <div class="app" role="application" aria-label="Panel de Cierre de Caja">
+        <aside id="sidebar" aria-label="Navegación principal">
+            <h2>Gestión de Caja</h2>
+            <nav aria-label="Secciones">
+                <a href="#" class="nav-link active" data-section="cierre-section"
+                    onclick="showSection(this); cargarPedidos()" id="link-cierre">💵 Cierre de Caja</a>
+                <a href="#" class="nav-link" data-section="historial-section"
+                    onclick="showSection(this); consultarCierreHistorico(false)" id="link-hist">📜 Historial de
+                    Cierres</a>
+                <a href="#" class="nav-link" data-section="producido-section" onclick="showSection(this)"
+                    id="link-prod">📊 Producido (Ventas)</a>
+            </nav>
+    <div id="sidebar-footer">
+        <button class="admin-btn" onclick="window.location.href='admin.html'">
+            ⚙️ Ir al Panel Admin
+        </button>
+    </div>
+
+        </aside>
+
+        <main class="main" id="main-content">
+            <div id="mobile-topbar" aria-hidden="true">
+                <button class="menu-btn" id="mobile-menu-btn" aria-label="Abrir menú">☰</button>
+                <div style="font-weight:800;color:var(--primary)">Gestión de Caja</div>
+            </div>
+
+            <section id="producido-section" class="card section-container" style="display:none">
+                <h1>📊 Producido por Método de Pago y Canal</h1>
+                <p style="color:var(--muted);margin-bottom:14px">Resumen de ventas a corte: <strong
+                        id="fechaCorteProducido">...</strong></p>
+
+                <div id="producido-loading" style="color:var(--warning);margin-bottom:10px">⏳ Cargando
+                    datos...</div>
+
+                <div class="producido-group card" style="padding:14px">
+                    <h2>Ventas Totales (Local + Domicilio)</h2>
+                    <table class="producido-table" aria-live="polite">
+                        <thead>
+                            <tr>
+                                <th>Método de Pago</th>
+                                <th>HOY</th>
+                                <th><span id="mesActual"></span></th>
+                                <th>AÑO <span id="yearActual"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="producido-body-general"></tbody>
+                    </table>
+                </div>
+
+                <div class="producido-group card" style="padding:14px;margin-top:12px">
+                    <h2>Domicilios</h2>
+                    <table class="producido-table" aria-live="polite">
+                        <thead>
+                            <tr>
+                                <th>Método de Pago</th>
+                                <th>HOY</th>
+                                <th><span id="mesActual2"></span></th>
+                                <th>AÑO <span id="yearActual2"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="producido-body-domicilio"></tbody>
+                    </table>
+                </div>
+
+                <div class="producido-group card" style="padding:14px;margin-top:12px">
+                    <h2>Total Ventas Netas</h2>
+                    <table class="producido-table" aria-live="polite">
+                        <thead>
+                            <tr>
+                                <th>Concepto</th>
+                                <th>HOY</th>
+                                <th><span id="mesActual3"></span></th>
+                                <th>AÑO <span id="yearActual3"></span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="producido-body-local-neto"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="cierre-section" class="card section-container" style="display:block">
+                <h1>💵 Cierre de Caja del Día</h1>
+                <p style="color:var(--muted);margin-bottom:8px">Conciliación para: <strong id="fechaActual">...</strong>
+                </p>
+                <div id="estadoCarga" style="color:var(--warning);margin-bottom:12px">⏳ Cargando datos
+                    de ventas...</div>
+
+                <div class="fecha-cierre-container">
+                    <label for="fechaCierreReal">Fecha del cierre:</label>
+                    <input type="date" id="fechaCierreReal" required />
+                    <button class="btn btn-reload" onclick="cargarPedidos()">Recargar Datos</button>
+                </div>
+                <div class="total-summary" role="region" aria-label="Resumen de ventas esperadas">
+                    <div class="label">Total Venta Esperado:</div>
+                    <div class="amount" id="ventaTotalSistema">$ 0</div>
+                </div>
+
+                <div class="esperado-grid" role="list" aria-label="Totales esperados por método">
+                    <div class="esperado-item" role="listitem">Efectivo Esperado: <strong id="efectivoEsperado">$
+                            0</strong></div>
+                    <div class="esperado-item" role="listitem">Transferencia Esperada: <strong
+                            id="transferenciaEsperada">$ 0</strong></div>
+                    <div class="esperado-item" role="listitem">Efectivo/Transferencia: <strong id="mixtoEsperado">$
+                            0</strong></div>
+                    <div class="esperado-item" role="listitem">Otros Esperado: <strong id="otrosEsperado">$ 0</strong>
+                    </div>
+                </div>
+
+                <div class="metric-group" aria-label="Conteo del cajero" style="margin-top:14px">
+                    <h2>Contabilizado por el cajero</h2>
+
+                    <div class="input-row">
+                        <label for="efectivoReal">Efectivo contado</label>
+                        <div class="input-right">
+                            <input type="number" id="efectivoReal" placeholder="0.00" step="0.01" inputmode="decimal"
+                                aria-label="Efectivo contado" />
+                            <div id="diffEfectivo" class="diff-indicator" aria-live="polite"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <label for="transferenciaReal">Transferencia</label>
+                        <div class="input-right">
+                            <input type="number" id="transferenciaReal" placeholder="0.00" step="0.01"
+                                inputmode="decimal" aria-label="Transferencia contada" />
+                            <div id="diffTransferencia" class="diff-indicator" aria-live="polite"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <label for="mixtoReal">Efectivo / Transferencia</label>
+                        <div class="input-right">
+                            <input type="number" id="mixtoReal" placeholder="0.00" step="0.01" inputmode="decimal"
+                                aria-label="Mixto contado" />
+                            <div id="diffMixto" class="diff-indicator" aria-live="polite"></div>
+                        </div>
+                    </div>
+
+                    <div class="input-row">
+                        <label for="otrosReal">Otros pagos</label>
+                        <div class="input-right">
+                            <input type="number" id="otrosReal" placeholder="0.00" step="0.01" inputmode="decimal"
+                                aria-label="Otros contados" />
+                            <div id="diffOtros" class="diff-indicator" aria-live="polite"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="diferenciaTotal" role="status" aria-live="polite">
+                    Ingrese los valores contados para calcular la diferencia total.
+                </div>
+
+                <div class="card" style="margin-top:12px;padding:14px">
+                    <div style="display:flex;flex-direction:column;gap:10px">
+                        <label for="responsableCierre" style="font-weight:700">Responsable que cierra</label>
+                        <input type="text" id="responsableCierre" placeholder="Ej: Juan Pérez"
+                            aria-label="Responsable del cierre" />
+                        <label for="notasCierre" style="font-weight:700;margin-top:6px">Notas (opcional)</label>
+                        <textarea id="notasCierre" rows="3" placeholder="Ej: Faltante por cambio mal dado"></textarea>
+
+                        <div class="actions">
+                            <button id="btnRegistrarCierre" class="btn" disabled aria-disabled="true">🔒 Registrar
+                                cierre</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="historial-section" class="card section-container" style="display:none">
+                <h1>📜 Historial de cierres</h1>
+                <p style="color:var(--muted)">Consulta registros anteriores</p>
+
+<div class="consulta-fecha-controls">
+    <label for="fechaConsulta" class="consulta-fecha-label">Buscar por fecha</label>
+    <input type="date" id="fechaConsulta" class="consulta-fecha-input" />
+    <button class="btn btn-primary" onclick="consultarCierreHistorico(true)">
+        🔎 Buscar
+    </button>
+    <button class="btn btn-secondary" onclick="consultarCierreHistorico(false)">
+        📜 Ver todo
+    </button>
+</div>
+
+                <div id="resultadoConsulta" style="margin-top:14px;color:var(--muted)">Haga clic en Buscar o Ver todo
+                    para cargar.</div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        /* =================================
+           CONFIG BÁSICA
+           ================================= */
+// Las URLs se cargarán dinámicamente desde ../config.json
+let API_URL_PEDIDOS = null; 
+let API_URL_CIERRES = null; 
+
+let sistemaData = null;
+let cierreData = null;
+let allPedidos = [];
+const RANGO_TOLERANCIA = 500;
+
+        // UTIL: formateo COP sin decimales
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(Math.round(Number(amount) || 0));
+        }
+
+        function formatFechaActual(date) {
+            const dd = String(date.getDate()).padStart(2, '0');
+            const mm = String(date.getMonth() + 1).padStart(2, '0');
+            const yyyy = date.getFullYear();
+            return `${dd}/${mm}/${yyyy}`;
+        }
+
+        function formatDateToSheets(date) {
+            const p = String(date).split('-');
+            if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+            return date;
+        }
+
+        function formatFechaCorte(date) {
+            return date.toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+        }
+
+        /* =================================
+           NAVEGACIÓN ENTRE SECCIONES
+           ================================= */
+        function showSection(element) {
+            const target = element.getAttribute('data-section');
+            document.querySelectorAll('.section-container').forEach(s => s.style.display = 'none');
+            document.getElementById(target).style.display = 'block';
+            document.querySelectorAll('.nav-link').forEach(a => a.classList.remove('active'));
+            element.classList.add('active');
+
+            // cerrar sidebar en móvil si está abierto
+            const sb = document.getElementById('sidebar');
+            if (window.innerWidth <= 899 && sb.classList.contains('active')) {
+                sb.classList.remove('active');
+            }
+        }
+
+        /* =================================
+           CARGA DE DATOS (PEDIDOS -> PRODUCIDO + CIERRE)
+           ================================= */
+        async function cargarPedidos() {
+// Verificar si las APIs ya fueron cargadas (NUEVA LÓGICA DE VERIFICACIÓN)
+            if (!API_URL_PEDIDOS || !API_URL_CIERRES) {
+                 // Si aún no están cargadas, salimos y esperamos a que el DOMContentLoaded las cargue.
+                 const estadoCargaCierre = document.getElementById('estadoCarga');
+                 if (estadoCargaCierre.textContent !== '⏳ Cargando configuración...') {
+                     estadoCargaCierre.textContent = '❌ Configuración no cargada. Intente recargar la página.';
+                     estadoCargaCierre.style.color = 'var(--danger)';
+                 }
+                 return;
+            }
+
+            const estadoCargaCierre = document.getElementById('estadoCarga');
+            const estadoCargaProducido = document.getElementById('producido-loading');
+            estadoCargaCierre.textContent = '⏳ Cargando...';
+            estadoCargaProducido.textContent = '⏳ Cargando datos para el análisis...';
+
+            try {
+                // ⭐ INICIO CAMBIO: OBTENER FECHA SELECCIONADA
+                const fechaInput = document.getElementById('fechaCierreReal');
+                // Asegurar que se tome la fecha del input, si está vacía, se puede dejar que falle o usar hoy. 
+                // Mejor, al estar inicializado en DOMContentLoaded, siempre tendrá un valor.
+                const fechaSeleccionada = new Date(fechaInput.value + 'T00:00:00'); // Convertir a Date object
+                
+                // Formato DD/MM/YYYY para filtrar en la hoja de cálculo
+                const fechaFiltroStr = formatFechaActual(fechaSeleccionada); 
+                
+                // Mostrar fecha seleccionada en UI
+                document.getElementById('fechaActual').textContent = formatFechaCorte(fechaSeleccionada);
+                document.getElementById('fechaCorteProducido').textContent = formatFechaCorte(fechaSeleccionada);
+
+                // Los datos de Producido no tienen control de fecha, así que se mantienen para "hoy" (fecha del sistema).
+                const today = new Date(); 
+                const monthName = today.toLocaleDateString('es-ES', { month: 'long' }).toUpperCase();
+                const yearNow = today.getFullYear();
+                document.getElementById('mesActual').textContent = monthName;
+                document.getElementById('mesActual2').textContent = monthName;
+                document.getElementById('mesActual3').textContent = monthName;
+                document.getElementById('yearActual').textContent = yearNow;
+                document.getElementById('yearActual2').textContent = yearNow;
+                document.getElementById('yearActual3').textContent = yearNow;
+                // ⭐ FIN CAMBIO
+
+                const resp = await fetch(API_URL_PEDIDOS);
+                if (!resp.ok) throw new Error('Error en la API de pedidos: ' + resp.status);
+                allPedidos = await resp.json();
+
+                // ⭐ USO DE fechaFiltroStr para calcular cierre del día
+                const { cierreDataHoy, pedidosContados } = calcularDatosCierre(allPedidos, fechaFiltroStr);
+                sistemaData = cierreDataHoy;
+                renderEsperado(sistemaData);
+
+                estadoCargaCierre.textContent = `✅ ${pedidosContados} pedidos procesados para cierre del ${fechaFiltroStr}.`;
+                estadoCargaCierre.style.color = 'var(--success)';
+
+                // producido usa la fecha de "hoy" (del sistema) ya que es un reporte general.
+                const prodGeneral = calcularProducido(allPedidos, today, 'general');
+                renderProducido(prodGeneral, 'producido-body-general');
+
+                const prodDomi = calcularProducido(allPedidos, today, 'domicilio');
+                renderProducidoSoloTotal(prodDomi, 'producido-body-domicilio');
+
+                renderTotalLocalNeto(prodGeneral, prodDomi, 'producido-body-local-neto');
+
+                estadoCargaProducido.textContent = `✅ ${allPedidos.length} pedidos procesados para producido.`;
+                estadoCargaProducido.style.color = 'var(--success)';
+
+                // recalcular diferencias (si el usuario ya escribió algo)
+                calcularDiferenciasTiempoReal();
+                checkResponsable();
+
+            } catch (err) {
+                console.error('Error al cargar pedidos:', err);
+                estadoCargaCierre.textContent = '❌ Error al cargar datos. Revisa la API.';
+                estadoCargaCierre.style.color = 'var(--danger)';
+                document.getElementById('producido-loading').textContent = '❌ Error al cargar datos.';
+                document.getElementById('producido-loading').style.color = 'var(--danger)';
+            }
+        }
+
+        function cleanAndParseTotal(totalPagarString) {
+            return parseFloat(String(totalPagarString).replace('$', '').replace(/\./g, '').replace(',', '.').trim()) || 0;
+        }
+
+        function determinarCanal(pedido) {
+            const ref = String(pedido.referencia || pedido.idPedido || '').toUpperCase();
+            const canalField = String(pedido.canalVenta || '').toUpperCase();
+            if (ref.startsWith('DOMICILIO#')) return 'domicilio';
+            if (canalField.includes('DOMICILIO')) return 'domicilio';
+            return 'local';
+        }
+
+        function calcularDatosCierre(pedidos, todayString) {
+            let ventaTotalEfectivo = 0, ventaTotalTransferencia = 0, ventaTotalMixto = 0, ventaTotalOtros = 0, pedidosContados = 0;
+            pedidos.forEach(p => {
+                const totalPagar = cleanAndParseTotal(p.totalPagar);
+                // Usa todayString (fecha seleccionada en DD/MM/YYYY) para filtrar
+                if (String(p.fecha).trim() === todayString) {
+                    pedidosContados++;
+                    const metodo = String(p.metodoPago || '').toLowerCase().trim();
+                    if (metodo === 'efectivo') ventaTotalEfectivo += totalPagar;
+                    else if (metodo === 'transferencia') ventaTotalTransferencia += totalPagar;
+                    else if (metodo.includes('efectivo/transferencia')) ventaTotalMixto += totalPagar;
+                    else ventaTotalOtros += totalPagar;
+                }
+            });
+            return {
+                cierreDataHoy: {
+                    ventaTotalEfectivo: Math.round(ventaTotalEfectivo),
+                    ventaTotalTransferencia: Math.round(ventaTotalTransferencia),
+                    ventaTotalMixto: Math.round(ventaTotalMixto),
+                    ventaTotalOtros: Math.round(ventaTotalOtros)
+                },
+                pedidosContados
+            };
+        }
+
+        function calcularProducido(pedidos, today, tipo) {
+            const currentYear = today.getFullYear();
+            const currentMonth = today.getMonth();
+            const todayString = formatFechaActual(today);
+            const producido = {
+                efectivo: { hoy: 0, mes: 0, anual: 0 },
+                transferencia: { hoy: 0, mes: 0, anual: 0 },
+                mixto: { hoy: 0, mes: 0, anual: 0 },
+                otros: { hoy: 0, mes: 0, anual: 0 }
+            };
+
+            pedidos.forEach(p => {
+                if (tipo === 'domicilio') {
+                    const costoDomicilio = Number(p.costoDomicilio) || 0;
+                    const fechaStr = String(p.fecha).trim();
+                    if (!fechaStr || fechaStr.split('/').length !== 3) return;
+                    const [dd, mm, yyyy] = fechaStr.split('/').map(n => parseInt(n, 10));
+                    const fechaPedido = new Date(yyyy, mm - 1, dd);
+                    if (fechaStr === todayString) producido.efectivo.hoy += costoDomicilio;
+                    if (fechaPedido.getMonth() === currentMonth && fechaPedido.getFullYear() === currentYear) producido.efectivo.mes += costoDomicilio;
+                    if (fechaPedido.getFullYear() === currentYear) producido.efectivo.anual += costoDomicilio;
+                    return;
+                }
+
+                const totalPagar = cleanAndParseTotal(p.totalPagar);
+                const fechaStr = String(p.fecha).trim();
+                if (!fechaStr || fechaStr.split('/').length !== 3) return;
+                const [dd, mm, yyyy] = fechaStr.split('/').map(n => parseInt(n, 10));
+                const pedidoDate = new Date(yyyy, mm - 1, dd);
+                const metodoPago = String(p.metodoPago || '').toLowerCase().trim();
+                let canalPago = 'otros';
+                if (metodoPago === 'efectivo') canalPago = 'efectivo';
+                else if (metodoPago === 'transferencia') canalPago = 'transferencia';
+                else if (metodoPago.includes('efectivo/transferencia')) canalPago = 'mixto';
+                if (fechaStr === todayString) producido[canalPago].hoy += totalPagar;
+                if (pedidoDate.getFullYear() === currentYear && pedidoDate.getMonth() === currentMonth) producido[canalPago].mes += totalPagar;
+                if (pedidoDate.getFullYear() === currentYear) producido[canalPago].anual += totalPagar;
+            });
+
+            ['efectivo', 'transferencia', 'mixto', 'otros'].forEach(c => {
+                ['hoy', 'mes', 'anual'].forEach(t => {
+                    producido[c][t] = Math.round(producido[c][t] * 100) / 100;
+                });
+            });
+
+            return producido;
+        }
+
+        function renderProducido(data, tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+            const metodos = [{ key: 'efectivo', label: 'EFECTIVO' }, { key: 'transferencia', label: 'TRANSFERENCIA' }, { key: 'mixto', label: 'EFECTIVO/TRANSFERENCIA' }, { key: 'otros', label: 'OTROS MÉTODOS' }];
+            let totalHoy = 0, totalMes = 0, totalAnual = 0;
+            metodos.forEach(m => {
+                const hoy = data[m.key].hoy, mes = data[m.key].mes, anual = data[m.key].anual;
+                totalHoy += hoy; totalMes += mes; totalAnual += anual;
+                const row = document.createElement('tr');
+                row.innerHTML = `<td>${m.label}</td><td>${formatCurrency(hoy)}</td><td>${formatCurrency(mes)}</td><td>${formatCurrency(anual)}</td>`;
+                tbody.appendChild(row);
+            });
+            const subtotal = document.createElement('tr');
+            subtotal.classList.add('subtotal-row');
+            subtotal.innerHTML = `<td>TOTAL</td><td>${formatCurrency(totalHoy)}</td><td>${formatCurrency(totalMes)}</td><td>${formatCurrency(totalAnual)}</td>`;
+            tbody.appendChild(subtotal);
+        }
+
+        function renderProducidoSoloTotal(data, tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+            const totalHoy = data.efectivo.hoy + data.transferencia.hoy + data.mixto.hoy + data.otros.hoy;
+            const totalMes = data.efectivo.mes + data.transferencia.mes + data.mixto.mes + data.otros.mes;
+            const totalAnual = data.efectivo.anual + data.transferencia.anual + data.mixto.anual + data.otros.anual;
+            const row = document.createElement('tr');
+            row.classList.add('subtotal-row');
+            row.innerHTML = `<td>TOTAL DOMICILIOS</td><td>${formatCurrency(totalHoy)}</td><td>${formatCurrency(totalMes)}</td><td>${formatCurrency(totalAnual)}</td>`;
+            tbody.appendChild(row);
+        }
+
+        function renderTotalLocalNeto(generalData, domicilioData, tbodyId) {
+            const tbody = document.getElementById(tbodyId);
+            tbody.innerHTML = '';
+            const totalGeneralHoy = generalData.efectivo.hoy + generalData.transferencia.hoy + generalData.mixto.hoy + generalData.otros.hoy;
+            const totalGeneralMes = generalData.efectivo.mes + generalData.transferencia.mes + generalData.mixto.mes + generalData.otros.mes;
+            const totalGeneralAnual = generalData.efectivo.anual + generalData.transferencia.anual + generalData.mixto.anual + generalData.otros.anual;
+            const totalDomiHoy = domicilioData.efectivo.hoy + domicilioData.transferencia.hoy + domicilioData.mixto.hoy + domicilioData.otros.hoy;
+            const totalDomiMes = domicilioData.efectivo.mes + domicilioData.transferencia.mes + domicilioData.mixto.mes + domicilioData.otros.mes;
+            const totalDomiAnual = domicilioData.efectivo.anual + domicilioData.transferencia.anual + domicilioData.mixto.anual + domicilioData.otros.anual;
+            const hoyNeto = totalGeneralHoy - totalDomiHoy;
+            const mesNeto = totalGeneralMes - totalDomiMes;
+            const anualNeto = totalGeneralAnual - totalDomiAnual;
+            const row = document.createElement('tr');
+            row.classList.add('subtotal-row');
+            row.innerHTML = `<td>LOCAL NETO</td><td>${formatCurrency(hoyNeto)}</td><td>${formatCurrency(mesNeto)}</td><td>${formatCurrency(anualNeto)}</td>`;
+            tbody.appendChild(row);
+        }
+
+        /* =================================
+           RENDER VALORES ESPERADOS
+           ================================= */
+        function renderEsperado(data) {
+            const ventaTotalSistema = data.ventaTotalEfectivo + data.ventaTotalTransferencia + data.ventaTotalMixto + data.ventaTotalOtros;
+            document.getElementById('efectivoEsperado').textContent = formatCurrency(data.ventaTotalEfectivo);
+            document.getElementById('transferenciaEsperada').textContent = formatCurrency(data.ventaTotalTransferencia);
+            document.getElementById('mixtoEsperado').textContent = formatCurrency(data.ventaTotalMixto);
+            document.getElementById('otrosEsperado').textContent = formatCurrency(data.ventaTotalOtros);
+            document.getElementById('ventaTotalSistema').textContent = formatCurrency(ventaTotalSistema);
+        }
+
+        /* =================================
+           CALCULAR DIFERENCIAS EN TIEMPO REAL
+           - Nota: Indicadores individuales permanecen ocultos
+                   hasta que el usuario escriba.
+           - diferenciaTotal mostrará SOLO el mensaje resumido.
+           ================================= */
+        const campos = ['efectivoReal', 'transferenciaReal', 'mixtoReal', 'otrosReal'];
+        campos.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', calcularDiferenciasTiempoReal);
+                // evitar que el valor vacío devuelva "0" visualmente en indicador
+                el.addEventListener('focus', () => { el.select(); });
+            }
+        });
+
+        function calcularDiferenciasTiempoReal() {
+            if (!sistemaData) {
+                document.getElementById('diferenciaTotal').textContent = '⚠️ Esperando datos del sistema...';
+                return;
+            }
+
+            // Leer valores contados (si está vacío -> NaN -> tratamos como null)
+            const contadoEfectivo = parseFloat(document.getElementById('efectivoReal').value || 0);
+            const contadoTransferencia = parseFloat(document.getElementById('transferenciaReal').value || 0);
+            const contadoMixto = parseFloat(document.getElementById('mixtoReal').value || 0);
+            const contadoOtros = parseFloat(document.getElementById('otrosReal').value || 0);
+
+            const esperadoEfectivo = sistemaData.ventaTotalEfectivo || 0;
+            const esperadoTransferencia = sistemaData.ventaTotalTransferencia || 0;
+            const esperadoMixto = sistemaData.ventaTotalMixto || 0;
+            const esperadoOtros = sistemaData.ventaTotalOtros || 0;
+
+            const diffEfectivo = contadoEfectivo - esperadoEfectivo;
+            const diffTransferencia = contadoTransferencia - esperadoTransferencia;
+            const diffMixto = contadoMixto - esperadoMixto;
+            const diffOtros = contadoOtros - esperadoOtros;
+
+            const diffTotal = diffEfectivo + diffTransferencia + diffMixto + diffOtros;
+
+            // actualizar indicadores individuales SOLO si usuario escribió algo en ese campo
+            actualizarIndicadorIndividual('diffEfectivo', diffEfectivo, document.getElementById('efectivoReal').value);
+            actualizarIndicadorIndividual('diffTransferencia', diffTransferencia, document.getElementById('transferenciaReal').value);
+            actualizarIndicadorIndividual('diffMixto', diffMixto, document.getElementById('mixtoReal').value);
+            actualizarIndicadorIndividual('diffOtros', diffOtros, document.getElementById('otrosReal').value);
+
+            // actualizar indicador TOTAL (solo mensaje resumido)
+            renderDiferenciaTotal(diffTotal);
+
+            // preparar cierreData para envío
+            cierreData = {
+                // ⭐ CAMBIO: Se elimina la asignación de fecha aquí para usar la fecha del input al registrar
+                efectivoContado: contadoEfectivo, efectivoEsperado: esperadoEfectivo, diferenciaEfectivo: diffEfectivo,
+                transferenciaContada: contadoTransferencia, transferenciaEsperada: esperadoTransferencia, diferenciaTransferencia: diffTransferencia,
+                mixtoContado: contadoMixto, mixtoEsperado: esperadoMixto, diferenciaMixto: diffMixto,
+                otrosContados: contadoOtros, otrosEsperados: esperadoOtros, diferenciaOtros: diffOtros,
+                diferenciaTotal: diffTotal,
+                totalSistema: esperadoEfectivo + esperadoTransferencia + esperadoMixto + esperadoOtros,
+                totalContado: contadoEfectivo + contadoTransferencia + contadoMixto + contadoOtros
+            };
+
+            checkResponsable();
+        }
+
+        function actualizarIndicadorIndividual(elementId, diferencia, inputValue) {
+            const el = document.getElementById(elementId);
+            if (!el) return;
+
+            // Si el usuario NO ha escrito nada → ocultar indicador
+            if (!inputValue || inputValue === "") {
+                el.textContent = "";
+                el.style.opacity = 0;
+                el.style.color = 'transparent';
+                return;
+            }
+
+            const abs = Math.abs(diferencia);
+            if (abs < RANGO_TOLERANCIA) {
+                el.style.color = 'var(--success)';
+                el.textContent = '✅ Cuadrado';
+            } else if (diferencia > 0) {
+                el.style.color = 'var(--warning)';
+                el.textContent = `▲ Sobra: ${formatCurrency(diferencia)}`;
+            } else {
+                el.style.color = 'var(--danger)';
+                el.textContent = `▼ Falta: ${formatCurrency(Math.abs(diferencia))}`;
+            }
+            el.style.opacity = 1;
+        }
+
+        function renderDiferenciaTotal(diferenciaTotal) {
+            const cont = document.getElementById('diferenciaTotal');
+            const abs = Math.abs(diferenciaTotal);
+            let color = 'var(--muted)', icon = '', mensaje = '';
+
+            if (Math.abs(diferenciaTotal) < RANGO_TOLERANCIA) {
+                color = 'var(--success)';
+                icon = '⭐';
+                mensaje = 'CIERRE CUADRADO';
+            } else if (diferenciaTotal > 0) {
+                color = 'var(--warning)';
+                icon = '💰';
+                mensaje = `SOBRANTE DE ${formatCurrency(abs)}`;
+            } else {
+                color = 'var(--danger)';
+                icon = '🚨';
+                mensaje = `FALTANTE DE ${formatCurrency(abs)}`;
+            }
+
+            cont.style.backgroundColor = color + '20';
+            cont.style.borderColor = color;
+            cont.style.color = color;
+            cont.innerHTML = `<div style="font-size:1.15rem;font-weight:800">${icon} ${mensaje}</div>`;
+
+            // ajustar botón de registrar (solo visual)
+            const btn = document.getElementById('btnRegistrarCierre');
+            if (btn) {
+                btn.style.background = color;
+            }
+        }
+
+        /* =================================
+           REGISTRAR CIERRE (POST)
+           ================================= */
+        async function registrarCierreAPI() {
+            const responsable = document.getElementById('responsableCierre').value.trim();
+            const notas = document.getElementById('notasCierre').value.trim();
+
+            if (!confirm('¿Desea registrar el cierre con los valores actuales?')) return;
+            if (!cierreData || !sistemaData) {
+                alert('Faltan datos para registrar. Asegúrese de que los datos del sistema estén cargados y haya hecho el conteo.');
+                return;
+            }
+            if (!responsable || responsable.length < 2) {
+                alert('Ingrese el nombre del responsable (mínimo 2 caracteres).');
+                return;
+            }
+
+            // ⭐ INICIO CAMBIO: Capturar ambas fechas y la hora
+
+            // 1. Obtener la fecha y hora ACTUAL del sistema (Fecha Cierre)
+            const hoy = new Date();
+            const fechaCierreActual = formatFechaActual(hoy); 
+            // Formato HH:MM:SS para Hora Cierre
+            const horaCierreActual = hoy.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+
+            // 2. Obtener la fecha seleccionada por el usuario (Fecha Cierre Tardio)
+            const fechaCierreInput = document.getElementById('fechaCierreReal').value;
+            const fechaCierreTardioDate = new Date(fechaCierreInput + 'T00:00:00');
+            const fechaCierreTardio = formatFechaActual(fechaCierreTardioDate); 
+
+// ⭐ CÓDIGO CORREGIDO PARA EL PAYLOAD ⭐
+const payload = { 
+    // Los dos campos de fecha y la hora (en el orden lógico de tu encabezado)
+    fechaCierreActual: fechaCierreActual,       
+    fechaCierreTardio: fechaCierreTardio,       
+    horaCierre: horaCierreActual,               
+    
+    // Responsable y Notas
+    usuario: responsable, 
+    notas: notas,
+
+    // Datos financieros (tomados de cierreData, explícitamente listados)
+    // 1. EFECTIVO
+    efectivoContado: cierreData.efectivoContado,
+    efectivoEsperado: cierreData.efectivoEsperado, 
+    diferenciaEfectivo: cierreData.diferenciaEfectivo,
+
+    // 2. TRANSFERENCIA
+    transferenciaContada: cierreData.transferenciaContada,
+    transferenciaEsperada: cierreData.transferenciaEsperada,
+    diferenciaTransferencia: cierreData.diferenciaTransferencia,
+    
+    // 3. EFECTIVO / TRANSFERENCIA (Mixto) - ¡CLAVES CORREGIDAS!
+    efectivoTransferenciaContada: cierreData.mixtoContado, // ✅ Cambiado
+    efectivoTransferenciaEsperada: cierreData.mixtoEsperado, // ✅ Cambiado
+    diferenciaEfectivoTransferencia: cierreData.diferenciaMixto, // ✅ Cambiado
+
+    // 4. OTROS
+    otrosContados: cierreData.otrosContados,
+    otrosEsperados: cierreData.otrosEsperados,
+    diferenciaOtros: cierreData.diferenciaOtros,
+
+    // 5. TOTALES
+    diferenciaTotal: cierreData.diferenciaTotal,
+    totalSistema: cierreData.totalSistema,
+    totalContado: cierreData.totalContado
+};
+// ⭐ FIN CÓDIGO CORREGIDO
+
+            const btn = document.getElementById('btnRegistrarCierre');
+            const original = btn.textContent;
+            btn.disabled = true; btn.textContent = 'Enviando...';
+
+            try {
+                const resp = await fetch(API_URL_CIERRES, { method: 'POST', body: JSON.stringify(payload) });
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    alert('✅ Cierre registrado con éxito.');
+                    btn.textContent = '✅ Registrado';
+                    btn.disabled = true;
+                } else {
+                    throw new Error(data.message || 'Error en API');
+                }
+            } catch (err) {
+                console.error('Error registrar cierre:', err);
+                alert('❌ Error al registrar. Revisa la consola o la API.');
+                btn.disabled = false; btn.textContent = original;
+                btn.style.background = 'var(--danger)';
+            }
+        }
+
+        /* =================================
+           HISTORIAL (CONSULTA / ELIMINAR)
+           ================================= */
+// ...
+        async function consultarCierreHistorico(filtrarPorFecha) {
+            const inputFecha = document.getElementById('fechaConsulta');
+            const resultadoDiv = document.getElementById('resultadoConsulta');
+
+            let url = API_URL_CIERRES;
+            let fecha = null;
+            if (filtrarPorFecha) {
+                if (!inputFecha.value) { resultadoDiv.textContent = 'Selecciona una fecha.'; resultadoDiv.style.color = 'var(--danger)'; return; }
+                fecha = formatDateToSheets(inputFecha.value);
+                url = `${API_URL_CIERRES}?fecha=${fecha}`;
+            }
+            resultadoDiv.innerHTML = filtrarPorFecha ? `⏳ Buscando cierres: ${fecha}...` : '⏳ Cargando todos los cierres...';
+            resultadoDiv.style.color = 'var(--muted)';
+
+            try {
+                const resp = await fetch(url);
+                const data = await resp.json();
+                if (data.status === 'ok') {
+                    if (Array.isArray(data.resultados) && data.resultados.length) {
+                        let html = `<h3>✅ ${data.resultados.length} cierre(s) encontrado(s)</h3>`;
+                        
+                        // Ordenar por fecha y hora descendente
+                        data.resultados.sort((a, b) => {
+                            const dateA = new Date(a["Fecha Cierre"].split('/').reverse().join('-') + ' ' + (a["Hora Cierre"] || '00:00'));
+                            const dateB = new Date(b["Fecha Cierre"].split('/').reverse().join('-') + ' ' + (b["Hora Cierre"] || '00:00'));
+                            return dateB - dateA;
+                        });
+                        
+                        data.resultados.forEach(c => {
+                            const diffTotal = parseFloat(c["Diferencia Total"]) || 0;
+                            const absTotal = Math.abs(diffTotal);
+                            let colorTotal = diffTotal > 0 ? 'var(--warning)' : diffTotal < 0 ? 'var(--danger)' : 'var(--success)';
+                            let estado = Math.abs(diffTotal) < RANGO_TOLERANCIA ? 'CUADRADO' : (diffTotal > 0 ? `SOBRA ${formatCurrency(absTotal)}` : `FALTA ${formatCurrency(absTotal)}`);
+                            const rowIndex = parseInt(c["Fila ID"]);
+                            const notas = c["Notas/Observaciones"] || 'Sin notas.';
+
+                            // Función auxiliar para obtener color basado en la diferencia
+                            const getColor = (diff) => diff == 0 ? 'var(--success)' : (diff > 0 ? 'var(--warning)' : 'var(--danger)');
+                            
+                            // Detalle por método de pago
+                            const detalles = [
+                                { 
+                                    metodo: 'Efectivo', 
+                                    contado: parseFloat(c["Efectivo Contado"]) || 0, 
+                                    esperado: parseFloat(c["Efectivo Esperado"]) || 0, 
+                                    diferencia: parseFloat(c["Diferencia Efectivo"]) || 0 
+                                },
+                                { 
+                                    metodo: 'Transferencia', 
+                                    contado: parseFloat(c["Transferencia Contada"]) || 0, 
+                                    esperado: parseFloat(c["Transferencia Esperada"]) || 0, 
+                                    diferencia: parseFloat(c["Diferencia Transferencia"]) || 0 
+                                },
+                                { 
+                                    metodo: 'Efectivo/Transf.', 
+                                    contado: parseFloat(c["Efectivo/Transferencia Contada"]) || 0, 
+                                    esperado: parseFloat(c["Efectivo/Transferencia Esperada"]) || 0, 
+                                    diferencia: parseFloat(c["Diferencia Efectivo/Transferencia"]) || 0 
+                                },
+                                { 
+                                    metodo: 'Otros', 
+                                    contado: parseFloat(c["Otros Contados"]) || 0, 
+                                    esperado: parseFloat(c["Otros Esperados"]) || 0, 
+                                    diferencia: parseFloat(c["Diferencia Otros"]) || 0 
+                                }
+                            ];
+                            
+                            // Construcción del HTML
+                            html += `
+                                <div style="padding:15px;border-radius:12px;margin-top:10px;background:var(--card);border:1px solid var(--line);border-left:5px solid ${colorTotal};box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
+                                  
+                                  <div style="justify-content:space-between;align-items:center;padding-bottom:10px;border-bottom:1px solid var(--line);">
+                                    <div style="flex-grow:1;">
+                                      <div style="font-weight:900;font-size:1.1rem;color:var(--text);">
+                                        Cierre del ${c["Fecha Cierre"]} a las ${c["Hora Cierre"] || 'N/A'}
+                                      </div>
+                                      <div style="color:var(--muted);font-size:0.9rem;">
+                                        Responsable: ${c["Responsable Cierre"] || 'N/A'}
+                                      </div>
+                                    </div>
+                                    <div style="display:flex;justify-content:space-between;gap:15px;align-items:center;flex-shrink:0;">
+                                      <div style="font-weight:900;color:${colorTotal};text-align:right;font-size:1.2rem;">
+                                        ${estado}
+                                      </div>
+                                      <button style="background:var(--danger);color:var(--text);border:none;border-radius:8px;padding:8px 12px;cursor:pointer;font-weight:700;box-shadow: 0 2px 4px rgba(0,0,0,0.2);" onclick="eliminarCierreAPI(${rowIndex})">
+                                        🗑️ Eliminar
+                                      </button>
+                                    </div>
+                                  </div>
+
+<div style="overflow-x: auto; margin-top: 15px;">
+    
+    <div style="display:grid; grid-template-columns: minmax(150px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr) minmax(120px, 1fr); font-size: 0.95rem; gap: 15px; min-width: 550px; padding-bottom: 5px;">
+        
+        <span style="font-weight:800;color:var(--accent, #ffc400);">MÉTODO</span>
+        <span style="font-weight:800;text-align:right;color:var(--accent, #ffc400);">ESPERADO</span>
+        <span style="font-weight:800;text-align:right;color:var(--accent, #ffc400);">CONTADO</span>
+        <span style="font-weight:800;text-align:right;color:var(--accent, #ffc400);">DIFERENCIA</span>
+        
+        ${detalles.map(d => `
+            <span style="font-weight:500;color:var(--text, #fff);">${d.metodo}</span>
+            <span style="text-align:right;color:var(--muted, #aaa);">${formatCurrency(d.esperado)}</span>
+            <span style="text-align:right;color:var(--text, #fff);font-weight:600;">${formatCurrency(d.contado)}</span>
+            <span style="text-align:right;font-weight:800;color:${getColor(d.diferencia)}">
+                ${formatCurrency(d.diferencia)}
+            </span>
+        `).join('')}
+        
+    </div>
+</div>
+
+                                  <div style="margin-top:15px;padding-top:10px;border-top:1px dashed var(--line);font-size:0.9rem;color:var(--text);">
+                                    <span style="font-weight:700;color:var(--muted)">Notas/Observaciones:</span> ${notas}
+                                  </div>
+
+                                </div>
+                            `;
+                        });
+                        resultadoDiv.innerHTML = html;
+                    } else {
+                        resultadoDiv.innerHTML = `<h3>⚠️ No se encontraron cierres para el periodo.</h3>`;
+                        resultadoDiv.style.color = 'var(--warning)';
+                    }
+                } else {
+                    resultadoDiv.innerHTML = `❌ Error: ${data.message || 'API'}`; resultadoDiv.style.color = 'var(--danger)';
+                }
+            } catch (err) {
+                console.error('Error consultar cierre:', err);
+                resultadoDiv.innerHTML = '❌ Error de conexión al consultar la API.'; resultadoDiv.style.color = 'var(--danger)';
+            }
+        }
+// ...
+
+/* =================================
+   FUNCIÓN DE ELIMINACIÓN DE CIERRE (API)
+   ================================= */
+async function eliminarCierreAPI(rowIndex) {
+    if (!confirm(`⚠️ ¿Estás seguro de que quieres eliminar permanentemente el cierre de caja?`)) {
+        return;
+    }
+
+    const resultadoDiv = document.getElementById('resultadoConsulta');
+    resultadoDiv.innerHTML = `⏳ Eliminando cierre...`;
+    resultadoDiv.style.color = 'var(--muted)';
+
+    // Construye la URL de eliminación que tu Google Apps Script espera:
+    // API_URL_CIERRES?action=delete&rowIndex=X
+    const urlEliminar = `${API_URL_CIERRES}?action=delete&rowIndex=${rowIndex}`;
+
+    try {
+        const resp = await fetch(urlEliminar);
+        const data = await resp.json();
+
+        if (data.status === 'ok') {
+            alert(`✅ Eliminación exitosa`);
+            // Después de eliminar, recarga el historial para que desaparezca el registro
+            consultarCierreHistorico(false); // Recarga sin filtro de fecha
+        } else {
+            alert(`❌ Error al eliminar: ${data.message}`);
+            resultadoDiv.innerHTML = `❌ Error al eliminar.`;
+            resultadoDiv.style.color = 'var(--danger)';
+            // Si hay error, recarga de todas formas para mostrar el estado actual
+            consultarCierreHistorico(false);
+        }
+
+    } catch (err) {
+        console.error('Error en eliminarCierreAPI:', err);
+        alert('❌ Error de conexión al intentar eliminar el cierre.');
+        resultadoDiv.innerHTML = '❌ Error de conexión.';
+        resultadoDiv.style.color = 'var(--danger)';
+    }
+}
+
+        /* =================================
+           CHECK RESPONSABLE (habilitar botón)
+           ================================= */
+        function checkResponsable() {
+            const responsable = document.getElementById('responsableCierre').value.trim();
+            const btn = document.getElementById('btnRegistrarCierre');
+            const enabled = Boolean(sistemaData) && responsable.length > 2;
+            btn.disabled = !enabled;
+            btn.setAttribute('aria-disabled', String(!enabled));
+        }
+
+        /* =================================
+           MOBILE MENU TOGGLE
+           ================================= */
+document.getElementById('mobile-menu-btn')?.addEventListener('click', (e) => {
+  // const el = e.currentTarget; // 'el' ya no es necesario
+  document.getElementById('sidebar').classList.toggle('active');
+});
+
+        /* =================================
+           EVENTOS INICIALES
+           ================================= */
+document.addEventListener('DOMContentLoaded', () => {
+            const today = new Date();
+            const yyyy = today.getFullYear(), mm = String(today.getMonth() + 1).padStart(2, '0'), dd = String(today.getDate()).padStart(2, '0');
+            const todayISO = `${yyyy}-${mm}-${dd}`;
+            
+            // Inicializar campo de fecha de cierre y consulta
+            const fechaConsultaEl = document.getElementById('fechaConsulta');
+            const fechaCierreEl = document.getElementById('fechaCierreReal');
+
+            if (fechaConsultaEl) fechaConsultaEl.value = todayISO;
+            if (fechaCierreEl) fechaCierreEl.value = todayISO;
+
+            // Asignar listeners
+            document.getElementById('btnRegistrarCierre').addEventListener('click', registrarCierreAPI);
+            document.getElementById('responsableCierre').addEventListener('input', checkResponsable);
+            fechaCierreEl?.addEventListener('change', cargarPedidos); // Nuevo listener para recargar al cambiar fecha
+
+            // ⭐ LÓGICA PRINCIPAL: CARGAR CONFIG.JSON
+            const estadoCargaCierre = document.getElementById('estadoCarga');
+            estadoCargaCierre.textContent = '⏳ Cargando configuración...';
+
+            fetch("../config.json")
+                .then(r => {
+                    if (!r.ok) {
+                        throw new Error(`Error HTTP: ${r.status}`);
+                    }
+                    return r.json();
+                })
+                .then(cfg => {
+                    // 1. Mapeo de URLs
+                    // Utilizamos reciboBaseDatos o envioBaseDatos para API_URL_PEDIDOS (son la misma URL en tu config)
+                    API_URL_PEDIDOS = cfg.apiUrls.reciboBaseDatos || cfg.apiUrls.envioBaseDatos; 
+                    API_URL_CIERRES = cfg.apiUrls.CajaDatos;
+                    
+                    if (!API_URL_PEDIDOS || !API_URL_CIERRES) {
+                         throw new Error("Una de las URLs de la API no está definida en config.json.");
+                    }
+
+                    estadoCargaCierre.textContent = '⏳ Configuración cargada. Cargando datos de ventas...';
+                    
+                    // 2. Asegurar que cierre-section se muestre al inicio
+                    const cierreLink = document.getElementById('link-cierre');
+                    if (cierreLink) showSection(cierreLink); 
+
+                    // 3. Cargar datos iniciales DESPUÉS de cargar la configuración
+                    cargarPedidos(); 
+                })
+                .catch(err => {
+                    console.error("❌ Error cargando config.json:", err);
+                    estadoCargaCierre.textContent = '❌ Error fatal al cargar configuración. Revise ../config.json.';
+                    estadoCargaCierre.style.color = 'var(--danger)';
+                    alert("Error al cargar la configuración de la API. Revise la consola.");
+                });
+            // ⭐ FIN LÓGICA PRINCIPAL
+        });
+
+        // mejorar UX: cerrar sidebar al redimensionar a desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 899) document.getElementById('sidebar').classList.remove('active');
+        });
+
+        /* =================================
+           FIN DEL SCRIPT
+           ================================= */
+    </script>
+</body>
+
+</html>

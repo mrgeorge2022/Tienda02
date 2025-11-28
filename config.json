@@ -1,0 +1,39 @@
+{
+    "tituloPagina": "Pide en Mr. George a domicilio | Restaurante | Ordena online",
+    "nombreRestaurante": "Mr. George",
+    "logo": "img/icono_tienda.png",
+    "colores": {
+        "--bg-body": "Url('img/fondobody.png') no-repeat center center / cover",
+        "--header": "linear-gradient(135deg, rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('img/fondoheader.png')",
+        "--accent": "#ffc400",
+        "--bg-skeleton": "linear-gradient(135deg, #f9f9f9, #e9e9e9)",
+        "--bg-start": "#333",
+        "--bg-end": "#444",
+        "--card-bg": "#222"
+    },
+    "redes": {
+        "whatsapp": "https://wa.me/573022666530",
+        "instagram": "https://www.instagram.com/mr_ge0rge/",
+        "facebook": "https://www.facebook.com/MISTERGE0RGE"
+    },
+    "numeroWhatsAppMensajes": "573022666530",
+    "footerQR": "img/QR_tienda.png",
+    "sede": {
+        "nombre": "Mr. George - Cartagena, Bolivar.",
+        "direccion": "San Fernando, Cl 5, Cra 81 f 05",
+        "telefono": "(+57) 302 266 6530"
+    },
+    "coordenadasSede": [
+        10.373750,
+        -75.473580
+    ],
+    "footerLogo": "img/logo.png",
+    "crearTienda": "https://wa.me/573022666530?text=Quiero%20crear%20mi%20tienda",
+    "apiUrls": {
+        "productos": "https://script.google.com/macros/s/AKfycbxE5905w07prM6Om7B972nZilOZOEi_IUgX2Cixf98F9t-U8A9ClVxq5pyRjXAt5Zg/exec",
+        "horario": "https://script.google.com/macros/s/AKfycbxW1cwQFbgWHXNZ84Qqu_-MMRxbbK1-UYjKS6CU_87lpb085YBJ-OyfzTrWzcdTSl-i/exec",
+        "envioBaseDatos": "https://script.google.com/macros/s/AKfycbwez78KX4oEXCGWV_olvy_J1C8YwURxN-1YaZiYYqQJPVLAJuaRI_5EVl4v14OMjonM/exec",
+        "reciboBaseDatos": "https://script.google.com/macros/s/AKfycbwez78KX4oEXCGWV_olvy_J1C8YwURxN-1YaZiYYqQJPVLAJuaRI_5EVl4v14OMjonM/exec",
+        "CajaDatos": "https://script.google.com/macros/s/AKfycbzoEN5CldFTrWRoNVdpDN0fQP-bx77rlpUdwdWi1HAIjBrGv3I0iuYnWUndPAAwvDxujg/exec"
+    }
+}

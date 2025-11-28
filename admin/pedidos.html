@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel de Pedidos</title>
+  <link rel="icon" type="image/png" href="../img/icono_tienda.png">
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ================================\
+       VARIABLES / RESET (Estilo Unificado)
+       ================================ */
+    :root {
+      --primary: #5bc0de;
+      --accent: #46b8da;
+      --muted: #909ba7;
+      --success: #63d471;
+      --warning: #f8c050;
+      --danger: #ff6b6b;
+      --bg: #1e1e2d; /* Fondo oscuro */
+      --card: #2b2b3f; /* Color de tarjeta oscura */
+      --line: #4a4a68;
+      --text: #f1f1f1; /* Texto claro */
+      --input: #3c3c50;
+      --shadow: rgba(0, 0, 0, 0.25);
+    }
+
+    body {
+      font-family: "Inter", sans-serif;
+      background: var(--bg);
+      margin: 0;
+      padding: 1rem;
+      color: var(--text);
+    }
+
+    h1 {
+      text-align: center;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+
+    /* BOTÓN VOLVER */
+    .volver-admin {
+      display: flex;
+      justify-content: flex-start; /* Se ajusta para que solo quede el botón de volver */
+      margin-bottom: 15px;
+    }
+
+    .volver-admin button {
+      background: var(--primary);
+      color: var(--text);
+      border: none;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      box-shadow: 0 4px 12px var(--shadow);
+      transition: all 0.25s ease;
+    }
+
+    .volver-admin button:hover {
+      background: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    /* FILTROS */
+    .filtros {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+      background: var(--card);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .filtros input,
+    .filtros button {
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      background: var(--input);
+      color: var(--text);
+    }
+    
+    .filtros input:focus, .filtros button:focus {
+        outline: none;
+        border-color: var(--accent);
+    }
+
+    .filtros button {
+      background: var(--accent);
+      color: var(--text);
+      cursor: pointer;
+      transition: background 0.2s;
+      font-weight: 600;
+    }
+
+    .filtros button:hover {
+      background: var(--primary);
+    }
+
+    /* ==== AGRUPADOR DE MES === */
+    .mes-header {
+      cursor: pointer;
+      background: var(--input);
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+      transition: background 0.2s;
+      color: var(--text);
+    }
+    
+    .mes-header:hover {
+        background: var(--line);
+    }
+
+    .mes-header span {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .pedidos-mes {
+      margin-top: 5px;
+      transition: max-height 0.3s ease-out;
+      overflow: hidden;
+    }
+    
+    .pedidos-mes.oculto {
+        max-height: 0;
+        margin-top: 0;
+    }
+
+    /* DETALLE DEL PEDIDO */
+    .pedido {
+      background: var(--card);
+      margin-bottom: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px var(--shadow);
+      overflow: hidden;
+      transition: all 0.3s ease;
+      border: 1px solid var(--line);
+    }
+    
+    .pedido.activo {
+        border-color: var(--primary);
+    }
+
+    .pedido-header {
+      padding: 12px 16px;
+      background: var(--card);
+      color: var(--text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      font-weight: 600;
+      flex-wrap: wrap;
+      border-bottom: 1px solid var(--line);
+      border-radius: 8px 8px 0 0;
+      transition: background 0.2s ease;
+      font-size: 14px;
+    }
+
+    .pedido-header:hover {
+      background: var(--input);
+    }
+
+    .pedido-header.new {
+      background: var(--input); /* Destacar con el color de input */
+      border-bottom: 1px solid var(--primary);
+    }
+
+    .pedido-header div {
+      display: flex;
+      line-height: 1.3;
+      justify-content: space-between;
+    }
+
+    .pedido-detalle {
+      display: none;
+      padding: 14px 16px;
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      color: var(--text);
+    }
+
+    .pedido.activo .pedido-detalle {
+      display: block;
+    }
+
+    /* === CABECERA DE PEDIDO === */
+    .pedido-info {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .pedido-linea {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .pedido-nombre {
+      font-weight: 600;
+      color: var(--text);
+      font-size: 0.95rem;
+    }
+    
+    .pedido-tipo-entrega {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--primary);
+        border: 1px solid var(--primary);
+        padding: 2px 6px;
+        border-radius: 4px;
+        margin-left: 8px; /* Separación del nombre */
+        flex-shrink: 0;
+    }
+
+    .pedido-factura {
+      color: var(--muted);
+      font-weight: 400;
+      margin-top: 2px;
+      font-size: 0.85rem;
+    }
+    
+    /* TOTAL A PAGAR (PROMINENTE) */
+    .pedido-total {
+        font-size: 1.1rem; 
+        font-weight: 800;
+        color: var(--success);
+        flex-shrink: 0;
+    }
+
+
+    /* Lista de productos */
+    .productos {
+      background: var(--input);
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      white-space: pre-wrap;
+      font-size: 0.85rem;
+      margin-top: 6px;
+      border: 1px solid var(--line);
+      color: var(--text);
+    }
+    
+    .pedido-detalle a {
+        color: var(--accent);
+        text-decoration: none;
+    }
+    
+    .pedido-detalle a:hover {
+        text-decoration: underline;
+    }
+
+    /* Botón de factura */
+    .boton-factura {
+      margin-top: 10px;
+      background: var(--primary);
+      color: var(--text);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.25s ease;
+    }
+
+    .boton-factura:hover {
+      background: var(--accent);
+    }
+
+
+    .cargando {
+      text-align: center;
+      color: var(--muted);
+      font-size: 1rem;
+      padding: 20px;
+    }
+
+    /* === ESTILO PARA BOTÓN ELIMINAR === */
+    .boton-eliminar {
+      background: var(--danger);
+      color: var(--text);
+      border: none;
+      padding: 10px 14px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      transition: background 0.25s ease;
+      margin-top: 10px;
+    }
+
+    .boton-eliminar:hover {
+      background: #c82333;
+    }
+
+    /* Para que los botones se vean bien en móvil */
+    .pedido-detalle button {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      margin-top: 10px;
+    }
+
+    @media (min-width: 600px) {
+      .pedido-detalle button {
+        display: inline-block;
+        width: auto;
+        margin-right: 10px;
+      }
+    }
+    
+    /* Pequeño ajuste para que los filtros se vean mejor */
+    @media (max-width: 500px) {
+        .filtros input,
+        .filtros button {
+            width: 100%;
+            box-sizing: border-box;
+        }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="volver-admin">
+    <button onclick="window.location.href='admin.html'">
+            ⚙️ Ir al Panel Admin
+        </button>
+  </div>
+  <h1>Panel de Pedidos</h1>
+
+
+
+  <div class="filtros">
+    <input type="text" id="buscar" placeholder="Buscar por nombre o factura...">
+    <input type="date" id="fechaFiltro">
+    <button id="filtrarBtn">🔍 Buscar</button>
+    <button id="recargarBtn">🔃 Recargar</button>
+  </div>
+
+  <div id="contenedorPedidos">
+    <div class="cargando">Cargando pedidos...</div>
+  </div>
+
+  <audio id="alertaAudio" src="https://assets.mixkit.co/active_storage/sfx/2567/2567-preview.mp3"></audio>
+
+  <script>
+
+    const contenedor = document.getElementById("contenedorPedidos");
+    const audio = document.getElementById("alertaAudio");
+
+    let pedidosGlobal = [];
+    let ultimasFacturas = new Set();
+    let API_URL = ''; // Se inicializa para evitar errores antes de cargar config.json
+
+    const formatoCOP = valor => {
+      const n = Number(valor) || 0;
+      return n.toLocaleString("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 });
+    };
+
+    async function cargarPedidos(auto = false) {
+      if (!auto) {
+        recargarBtn.disabled = true;
+        recargarBtn.textContent = "⏳ Actualizando...";
+      }
+
+      try {
+        const res = await fetch(API_URL + "?t=" + Date.now());
+        const data = await res.json();
+
+        const nuevasFacturas = data.map(p => p.numeroFactura);
+        const nuevos = nuevasFacturas.filter(f => !ultimasFacturas.has(f));
+
+        if (ultimasFacturas.size > 0 && nuevos.length > 0) {
+          audio.play();
+          mostrarAvisoNuevoPedido();
+        }
+
+        ultimasFacturas = new Set(nuevasFacturas);
+        pedidosGlobal = data;
+        mostrarPedidos(data, nuevos);
+        
+      } catch (error) {
+        console.error("Error al cargar pedidos:", error);
+        contenedor.innerHTML = "<p class='cargando'>Error al cargar pedidos.</p>";
+        alert("Error de conexión al cargar pedidos. Revisa la consola."); // Alerta alternativa
+      }
+
+      finally {
+        if (!auto) {
+          recargarBtn.disabled = false;
+          recargarBtn.textContent = "🔃 Recargar";
+        }
+      }
+
+    }
+
+    function mostrarPedidos(pedidos, nuevasFacturas = []) {
+      const mesesNombres = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+      const pedidosPorMes = {};
+
+      pedidos.forEach(p => {
+        if (!p.fecha) return;
+        const partes = p.fecha.split("/");
+        if (partes.length !== 3) return;
+        const mes = partes[1].padStart(2, "0");
+        if (!pedidosPorMes[mes]) pedidosPorMes[mes] = [];
+        pedidosPorMes[mes].push(p);
+      });
+      
+      // === LÓGICA ROBUSTA PARA MOSTRAR "NO HAY REGISTROS" EN TODOS LOS CASOS VACÍOS (inicial, filtro, o datos inválidos) ===
+      if (pedidos.length === 0 || Object.keys(pedidosPorMes).length === 0) {
+        contenedor.innerHTML = "<div class='cargando'>No hay registros.</div>";
+        return;
+      }
+      // ===================================================================================================================
+
+      contenedor.innerHTML = "";
+
+      Object.keys(pedidosPorMes).sort((a, b) => b - a).forEach(mes => {
+        const headerMes = document.createElement("div");
+        headerMes.className = "mes-header";
+        // Muestra el nombre del mes y el año (si está disponible y es distinto al actual)
+        const anio = pedidosPorMes[mes][0].fecha.split("/")[2] || new Date().getFullYear();
+        headerMes.innerHTML = `${mesesNombres[Number(mes) - 1]} ${anio !== new Date().getFullYear().toString() ? anio : ''}`;
+        contenedor.appendChild(headerMes);
+
+        const bloqueMes = document.createElement("div");
+        bloqueMes.className = "pedidos-mes";
+        
+        pedidosPorMes[mes].slice().reverse().forEach(p => {
+          const rowIndex = p.rowIndex;
+          const numFactura = (p.numeroFactura || "SIN NÚMERO").replace(/'/g, "\\'"); // Escapar comillas para JS
+          
+          const div = document.createElement("div");
+          div.className = "pedido";
+          // Añadir clase 'new' si es un nuevo pedido
+          if (nuevasFacturas.includes(p.numeroFactura)) {
+              div.querySelector(".pedido-header")?.classList.add("new");
+          }
+          div.innerHTML = `
+            <div class="pedido-header ${nuevasFacturas.includes(p.numeroFactura) ? 'new' : ''}">
+              <div class="pedido-info">
+                <div class="pedido-linea">
+                  <span class="pedido-nombre">${p.nombre || "Cliente sin nombre"}</span>
+                  <span class="pedido-tipo-entrega">${p.tipoEntrega || "—"}</span>
+                </div>
+                <div class="pedido-linea">
+                    <div class="pedido-factura">
+                        ${p.numeroFactura || "—"} | ${p.fecha || "—"} ${p.hora || ""}
+                    </div>
+                    <div class="pedido-total">${formatoCOP(p.totalPagar)}</div>
+                </div>
+              </div>
+            </div>
+            <div class="pedido-detalle">
+              <p><strong>Tipo Entrega:</strong> ${p.tipoEntrega || "—"}</p>
+              <p><strong>Teléfono:</strong> ${p.telefono ?? "0"}</p>
+              ${p.mesa ? `<p><strong>Mesa:</strong> ${p.mesa}</p>` : ""}
+              ${p.direccion ? `<p><strong>Dirección:</strong> ${p.direccion}</p>` : ""}
+              ${p.puntoReferencia ? `<p><strong>Punto Ref:</strong> ${p.puntoReferencia}</p>` : ""}
+              <p><strong>Productos:</strong></p>
+              <div class="productos">${(p.productos || "").replace(/\n/g, "<br>")}</div>
+              <p><strong>Total Productos:</strong> ${formatoCOP(p.totalProductos)}</p>
+              <p><strong>Costo Domicilio:</strong> ${formatoCOP(p.costoDomicilio)}</p>
+              <p><strong>Total a Pagar:</strong> ${formatoCOP(p.totalPagar)}</p>
+              <p><strong>Método de Pago:</strong> ${p.metodoPago || "—"}</p>
+              ${p.ubicacionGoogleMaps ? `<p><strong>Ubicación:</strong> <a href="${p.ubicacionGoogleMaps}" target="_blank">Ver mapa</a></p>` : ""}
+              ${p.observaciones ? `<p><strong>Observaciones:</strong> ${p.observaciones}</p>` : ""}
+              <button class="boton-factura">👁️ Ver Factura</button>
+              
+              <button class="boton-eliminar" data-row-index="${rowIndex}" onclick="eliminarPedidoAPI(${rowIndex}, '${numFactura}')">🗑️ Eliminar</button>              
+            </div>
+          `;
+          div.querySelector(".pedido-header").addEventListener("click", () => div.classList.toggle("activo"));
+          div.querySelector(".boton-factura").addEventListener("click", () => {
+            let productosArray = [];
+            if (typeof p.productos === "string") {
+              productosArray = p.productos.split("\n").filter(x => x.trim() !== "").map(linea => {
+                const partes = linea.split("-").map(x => x.trim());
+                return { nombre: partes[0], cantidad: 1, precio: Number((partes[1] || "0").replace(/\D/g, "")) || 0 };
+              });
+            }
+            const pedidoLocal = {
+              tipoEntrega: p.tipoEntrega,
+              factura: p.numeroFactura,
+              fecha: p.fecha,
+              hora: p.hora,
+              cliente: { nombre: p.nombre, telefono: p.telefono ?? "0", mesa: p.mesa },
+              direccion: p.direccion,
+              productos: productosArray,
+              subtotal: Number(p.totalProductos || 0),
+              costoDomicilio: Number(p.costoDomicilio || 0),
+              totalPagar: Number(p.totalPagar || 0),
+              metodoPago: p.metodoPago,
+              observaciones: p.observaciones,
+              ubicacion: p.ubicacionGoogleMaps || ""
+            };
+            localStorage.setItem("lastPedido", JSON.stringify(pedidoLocal));
+            window.open("facturalocal.html", "_blank");
+          });
+          bloqueMes.appendChild(div);
+        });
+        contenedor.appendChild(bloqueMes);
+
+        // Toggle para ocultar/mostrar los pedidos del mes
+        headerMes.addEventListener("click", () => bloqueMes.classList.toggle("oculto"));
+      });
+    }
+
+    // 🔥 FUNCIÓN MODIFICADA: Ahora recibe y usa el número de factura
+    async function eliminarPedidoAPI(rowIndex, numeroFactura) {
+        if (rowIndex <= 1) { 
+            alert("Error: No se puede eliminar la fila de encabezado.");
+            return;
+        }
+
+        // Usa el número de factura en la confirmación
+        if (!confirm(`⚠️ ¿Estás seguro de que deseas ELIMINAR el pedido con FACTURA ${numeroFactura}? Esta acción es irreversible.`)) {
+            return;
+        }
+
+        const btn = document.querySelector(`.boton-eliminar[data-row-index="${rowIndex}"]`);
+        // Usamos el botón de factura como fallback si el de eliminar no se encuentra (caso extraño)
+        const finalBtn = btn || document.querySelector('.boton-factura'); 
+        
+        const originalText = finalBtn.textContent;
+        finalBtn.disabled = true;
+        finalBtn.textContent = 'Eliminando...';
+        
+        // Llama a la API con action=delete y el rowIndex
+        const urlDelete = `${API_URL}?action=delete&rowIndex=${rowIndex}`;
+
+        try {
+            const response = await fetch(urlDelete, { method: 'GET' });
+            const data = await response.json();
+
+            if (data.status === 'ok') {
+                // 🔥 CAMBIO EN EL MENSAJE DE ÉXITO
+                alert(`✅ Pedido con FACTURA ${numeroFactura} eliminado con éxito.`);
+                // Recarga los pedidos para actualizar la lista
+                cargarPedidos(false);
+            } else {
+                throw new Error(data.message || 'Error desconocido al eliminar.');
+            }
+
+        } catch (error) {
+            console.error("Error al eliminar el pedido:", error);
+            // 🔥 CAMBIO EN EL MENSAJE DE ERROR
+            alert(`❌ Error al eliminar el pedido con FACTURA ${numeroFactura}. Verifique la API y la consola.`);
+            finalBtn.disabled = false;
+            finalBtn.textContent = originalText;
+        }
+    }
+
+    function filtrarPedidos() {
+      const texto = document.getElementById("buscar").value.toLowerCase();
+      const fechaFiltro = document.getElementById("fechaFiltro").value;
+
+      const filtrados = pedidosGlobal.filter(p => {
+        const coincideTexto =
+          (p.nombre || "").toLowerCase().includes(texto) ||
+          (p.numeroFactura || "").toLowerCase().includes(texto);
+
+        let coincideFecha = true;
+        if (fechaFiltro && p.fecha) {
+          const partes = p.fecha.split("/");
+          if (partes.length === 3) {
+            const fechaPedido = `${partes[2]}-${partes[1].padStart(2, "0")}-${partes[0].padStart(2, "0")}`;
+            coincideFecha = fechaPedido === fechaFiltro;
+          } else {
+            coincideFecha = false;
+          }
+        }
+
+        return coincideTexto && coincideFecha;
+      });
+
+      // Se elimina la verificación explícita de filtrados.length y se delega a mostrarPedidos
+      mostrarPedidos(filtrados);
+    }
+
+    document.getElementById("filtrarBtn").addEventListener("click", filtrarPedidos);
+    const recargarBtn = document.getElementById("recargarBtn");
+    recargarBtn.addEventListener("click", () => cargarPedidos(false));
+
+    function mostrarAvisoNuevoPedido() {
+      document.title = "¡Nuevo pedido!";
+      setTimeout(() => {
+        document.title = "Panel de Pedidos";
+      }, 3000);
+    }
+
+
+    fetch("../config.json")
+      .then(r => r.json())
+      .then(cfg => {
+        API_URL = cfg.apiUrls.reciboBaseDatos || cfg.apiUrls.envioBaseDatos;
+        cargarPedidos(); // ✅ se llama solo aquí
+      })
+      .catch(err => {
+        console.error("❌ Error cargando config.json:", err);
+        alert("Error al cargar configuración de la API."); // Alerta alternativa
+      });
+
+
+  </script>
+</body>
+
+</html>

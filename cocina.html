@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title></title>
+  <link id="favicon" rel="icon" type="image/png" href="">
+  <style>
+    :root {
+      --bg-body: linear-gradient(135deg, #fafafa, #eceff1);
+      --card-bg: #ffffff;
+      --muted: #616161;
+      --text-color: #212121;
+      --textarea: #f9f9f9;
+      --soft-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      --glass-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+
+      /* Colores por tipo */
+      --color-domicilio: #ff7043;
+      --color-mesa: #29b6f6;
+      --color-recoger: #66bb6a;
+    }
+
+    /* ===== RESET ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-body);
+      color: var(--text-color);
+      padding: 1rem;
+      min-height: 100vh;
+    }
+
+    /* ===== ENCABEZADO ===== */
+    .header {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .header img {
+      width: 45px;
+      height: 45px;
+      object-fit: contain;
+    }
+
+    .header h1 {
+      font-size: 2.2rem;
+      font-weight: 700;
+      color: var(--text-color);
+      text-align: center;
+      letter-spacing: 0.5px;
+    }
+
+    @media (max-width: 600px) {
+      .header h1 { font-size: 1.6rem; }
+      .header img { width: 36px; height: 36px; }
+    }
+    /* ===== FECHA Y BOTÓN ===== */
+    .fecha-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.8rem;
+      padding: 6px;
+      border-radius: 12px;
+    }
+
+    #fechabtn {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      max-width: 350px;
+
+    }
+
+    label {
+      font-weight: 600;
+      color: var(--muted);
+      margin-right: 0.5rem;
+    }
+
+    input[type="date"] {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 0.5rem 0.8rem;
+      font-size: 1rem;
+      border: 1px solid #c9c9c9;
+      border-radius: 8px;
+      background: var(--textarea);
+      transition: all 0.2s ease;
+      outline: none;
+      color: var(--text-color);
+    }
+
+    input[type="date"]:focus {
+      border-color: var(--color-mesa);
+      box-shadow: 0 0 0 3px rgba(41, 182, 246, 0.25);
+    }
+
+
+    /* ===== BOTÓN RECARGAR ===== */
+    #btn-recargar {
+      background: #000;
+      border: none;
+      color: #fff;
+      font-weight: 600;
+      padding: 0.6rem 1.3rem;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: var(--soft-shadow);
+      font-size: 1rem;
+      transition: all 0.25s ease;
+    }
+
+    #btn-recargar:active {
+      transform: scale(0.97);
+    }
+
+    /* ======================================= */
+/* 🆕 FILTROS DE TIPO (Interruptores Toggle) */
+/* ======================================= */
+
+/* Contenedor general de los interruptores */
+.filter-switches {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap; /* Para que se ajusten en pantallas pequeñas */
+}
+
+/* Oculta el checkbox nativo para que solo se vea la etiqueta estilizada */
+.filter-input {
+  display: none;
+}
+
+/* Estilo base de la etiqueta (el cuerpo visible del interruptor) */
+.filter-label {
+  cursor: pointer;
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  border: 2px solid; /* Borde para el estado inactivo */
+  opacity: 0.6; /* Un poco atenuado cuando está inactivo */
+  text-align: center;
+}
+
+/* Estilo ACTIVO (Cuando el input está 'checked') */
+.filter-input:checked + .filter-label {
+  opacity: 1; /* Color completo */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Sombra suave para destacar */
+  transform: translateY(-1px); /* Ligero efecto de "presionado" */
+}
+
+
+#filter-domicilio:checked + .filter-label {
+  background: var(--color-domicilio);
+  color: #fff;
+  border-color: var(--color-domicilio);
+}
+
+/* Colores para el interruptor de Mesa */
+
+#filter-mesa:checked + .filter-label {
+  background: var(--color-mesa);
+  color: #fff;
+  border-color: var(--color-mesa);
+}
+
+
+#filter-recoger:checked + .filter-label {
+  background: var(--color-recoger);
+  color: #fff;
+  border-color: var(--color-recoger);
+}
+
+/* Ajuste responsive: hace que los interruptores ocupen todo el ancho en móviles */
+@media (max-width: 600px) {
+  .filter-switches {
+    justify-content: space-around;
+    width: 100%;
+  }
+  .filter-label {
+    flex-grow: 1; 
+    padding: 0.4rem 0.8rem;
+    font-size: 0.8rem;
+  }
+}
+
+    
+    /* ======================================= */
+    /* 🎨 CONTROLES DE SCROLL Y LISTA DE PEDIDOS */
+    /* ======================================= */
+    
+    /* Contenedor de botones de scroll (NUEVO) */
+    #scroll-button-container {
+        display: flex;
+        justify-content: center; /* Centrar las flechas */
+        gap: 20px; /* Espacio entre las flechas */
+        margin-top: 6px;
+      }
+    
+    /* Flechas de Scroll (MODIFICADO) */
+    .scroll-arrow {
+        background: none; /* Fondo oscuro */
+        color: var(--text-color);
+        border: none;
+        padding: 10px; /* Más padding para que se pueda pulsar mejor */
+        cursor: pointer;
+        z-index: 20;
+        font-size: 1.5rem; /* Tamaño de fuente más razonable para botón */
+        line-height: 1;
+        border-radius: 10px;
+        opacity: 1;
+        transition: all 0.2s ease;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+
+    .scroll-arrow:active {
+        transform: scale(0.95);
+    }
+    
+    /* Lista de pedidos (Mantenemos scroll horizontal y altura flexible) */
+    #lista-pedidos {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 1.5rem;
+      overflow-x: auto;
+      padding: 1rem 0;
+      scroll-behavior: smooth; 
+      align-items: flex-start;
+      padding-top: 1rem; 
+    }
+
+    /* Estilo para la barra de scroll */
+    #lista-pedidos::-webkit-scrollbar {
+     display: auto ;
+}
+
+    /* ===== PEDIDO (TICKET LOOK) ===== */
+    .pedido {
+      flex: 0 0 auto;
+      width: 230px;
+      height: auto;
+      background: var(--card-bg);
+      border-radius: 14px;
+      padding: 1rem 1.2rem;
+      box-shadow: var(--soft-shadow);
+      border-left: 6px solid var(--text-color);
+      overflow-wrap: break-word;
+      transition: all 0.25s ease;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+
+    /* ===== TIPO DE ENTREGA ===== */
+    .tipo-entrega {
+      margin-bottom: 10px;
+      text-align: center;
+      font-weight: 700;
+      padding: 0.45rem 1rem;
+      display: inline-block;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      animation: fadeIn 0.3s ease-in;
+    }
+
+    .tipo-entrega.domicilio {
+      background: linear-gradient(45deg, #ff7043, #ff8a65);
+    }
+
+    .tipo-entrega.mesa {
+      background: linear-gradient(45deg, #29b6f6, #4fc3f7);
+    }
+
+    .tipo-entrega.recoger {
+      background: linear-gradient(45deg, #66bb6a, #81c784);
+    }
+
+    /* ===== BORDES SEGÚN TIPO ===== */
+    .pedido.domicilio {
+      border-left: 6px solid var(--color-domicilio);
+    }
+
+    .pedido.mesa {
+      border-left: 6px solid var(--color-mesa);
+    }
+
+    .pedido.recoger {
+      border-left: 6px solid var(--color-recoger);
+    }
+
+    /* ===== ENCABEZADO DE CADA PEDIDO ===== */
+    .pedido-header {
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .pedido-datos {
+      display: flex;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .pedido-numero strong {
+      color: #283593;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .pedido-hora {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    /* ===== CONTENIDO ===== */
+    .pedido strong {
+      color: var(--muted);
+    }
+
+    .productos {
+      padding: 5px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      margin-top: 0.6rem;
+    }
+
+    .pedido small {
+      display: block;
+      color: var(--muted);
+      margin-top: 0.3rem;
+      font-size: 0.85rem;
+    }
+
+    /* Contenedor de cantidad + detalle */
+    .cantidadproducto {
+      display: flex;
+      align-items: center;
+      padding: 0.3rem 0;
+      border-bottom: 1px solid #e0e0e0;
+      gap: 0.6rem;
+    }
+
+    /* Cantidad del producto */
+    .producto-cantidad {
+      font-weight: 700;
+      font-size: 30px;
+      min-width: 35px;
+      text-align: center;
+      color: var(--text-color);
+      flex-shrink: 0;
+      border-right: 1px solid #e0e0e0;
+    }
+
+    /* Detalle del producto */
+    .producto-detalle {
+      font-size: 0.95rem;
+      font-weight: bold;
+      word-break: break-word;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      flex: 1;
+    }
+
+
+
+    /* ===== DATOS COLOREADOS ===== */
+    .pedido-cliente span {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .pedido-direccion span {
+      color: var(--muted);
+    }
+
+    .pedido-mesa span {
+      color: var(--muted);
+    }
+
+    .pedido-observaciones span {
+      color: #d32f2f;
+      font-weight: 600;
+    }
+
+    /* ===== OBSERVACIONES ===== */
+    .observaciones {
+      margin-top: 10px;
+      color: #c62828;
+      font-size: 0.9rem;
+      font-weight: 500;
+      background: #ffebee;
+      padding: 0.5rem 0.6rem;
+      border-radius: 6px;
+      border-left: 4px solid #d32f2f;
+    }
+
+    /* ===== SIN PEDIDOS ===== */
+    p {
+      text-align: center;
+      color: var(--muted);
+      font-size: 1rem;
+      margin-top: 1.5rem;
+      font-style: italic;
+    }
+
+    /* ===== ANIMACIONES ===== */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    
+    /* 🚀 REGLA ELIMINADA: EL CONTENEDOR DE BOTONES DE SCROLL SE MOSTRARÁ EN TODAS LAS PANTALLAS */
+    
+    @media (max-width: 600px) {
+      .fecha-container {
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      #btn-recargar {
+        width: 100%;
+      }
+
+      h1 {
+        font-size: 1.6rem;
+      }
+    }
+
+    #resumen-pedidos {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      border-radius: 10px;
+      margin: 0 auto auto auto;
+      position: sticky;
+      top: 70px;
+      z-index: 10;
+      max-width: 400px;
+      left: 0;
+      right: 0;
+    }
+
+    .resumen-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.95rem;
+      font-weight: 500;
+    }
+
+    .resumen-circulo {
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--color);
+    }
+
+
+    /* ======================================= */
+/* 🖨️ ESTILO BOTÓN DE IMPRESIÓN */
+/* ======================================= */
+
+.btn-imprimir {
+  /* Apariencia */
+  background: #999; /* Color principal azul/cian */
+  color: #fff;
+  border: none;
+  padding: 2px;
+  margin-top: 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%; /* Ocupa todo el ancho del pedido */
+  text-align: center;
+  transition: all 0.2s ease;
+  
+  /* Asegura que el texto y el icono se muestren correctamente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px; /* Espacio entre el icono y el texto */
+}
+
+.btn-imprimir:hover {
+  background: #888; /* Un poco más claro al pasar el ratón */
+}
+
+.btn-imprimir:active {
+  transform: scale(0.98); /* Efecto de pulsación */
+}
+
+
+/* Asegurar que el botón no se imprima en la comanda real */
+@media print {
+    .btn-imprimir {
+        display: none !important;
+    }
+}
+
+
+
+/* ======================================= */
+    /* 🔄 LOADER CIRCULAR (NUEVO) */
+    /* ======================================= */
+    .loader-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        min-height: 150px; /* Para centrar la animación */
+    }
+
+    .loader {
+        border: 5px solid #f3f3f3; /* Color de fondo del borde (gris claro) */
+        border-top: 5px solid #999; /* Color de la parte animada (azul/cian) */
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+        animation: spin 1.2s linear infinite;
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="header">
+    <img id="logoCocina" src="" alt="Logo restaurante">
+    <h1>Panel de cocina</h1>
+  </div>
+
+  <div class="fecha-container">
+    <div id="fechabtn">
+      <input type="date" id="fecha">
+      <button id="btn-recargar">🔄 Recargar</button>
+    </div>
+
+    <div class="filter-switches" id="tipo-filtros">
+        <input type="checkbox" id="filter-recoger" class="filter-input" data-tipo="recoger" checked>
+        <label for="filter-recoger" class="filter-label">Recoger</label>
+
+                <input type="checkbox" id="filter-mesa" class="filter-input" data-tipo="mesa" checked>
+        <label for="filter-mesa" class="filter-label">Mesa</label>
+
+        <input type="checkbox" id="filter-domicilio" class="filter-input" data-tipo="domicilio" checked>
+        <label for="filter-domicilio" class="filter-label">Domicilio</label>
+        
+        
+    </div>
+
+  </div>
+
+  <div id="resumen-pedidos" class="resumen-pedidos"></div>
+  
+  <div id="scroll-button-container">
+      <button class="scroll-arrow" id="scroll-left" aria-label="Desplazar a la izquierda">◀</button>
+      <button class="scroll-arrow" id="scroll-right" aria-label="Desplazar a la derecha">▶</button>
+  </div>
+
+<div id="lista-pedidos">
+    <div class="loader-container">
+        <div class="loader"></div>
+    </div>
+  </div>
+
+  <script>
+    // ================================
+    // 🧩 Cargar nombre, logo y favicon desde config.json
+    // ================================
+    fetch("config.json")
+      .then(res => res.json())
+      .then(config => {
+        // 🏷️ Cambiar título de pestaña
+        document.title = `Cocina | ${config.nombreRestaurante || "Mi Restaurante"}`;
+
+        // 🖼️ Cambiar favicon
+        const favicon = document.getElementById("favicon");
+        if (favicon) {
+          favicon.href = config.favicon || config.logoHeader || config.logo || "img/icono_tienda.png";
+        }
+
+        // 🍽️ Colocar logo en el encabezado
+        const logoCocina = document.getElementById("logoCocina");
+        if (logoCocina) {
+          logoCocina.src = config.logoHeader || config.logo || "img/icono_tienda.png";
+        }
+      })
+      .catch(err => console.warn("No se pudo cargar config.json:", err));
+  </script>
+
+  <script src="cocina.js"></script>
+  <script>
+    document.getElementById("btn-recargar").addEventListener("click", () => {
+      location.reload();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gestor de Productos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Top bar con botón hamburguesa -->
+    <header class="topbar">
+      <div class="header-title">📋 Gestor de Productos</div>
+      <button id="menuBtn" class="hamburger" aria-label="Abrir menú" title="Menú">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+    </header>
+
+    <!-- Panel lateral (off-canvas) -->
+    <aside id="sidePanel" class="side-panel" aria-hidden="true">
+      <button id="closePanel" class="close-panel" aria-label="Cerrar panel">×</button>
+      <nav class="side-nav">
+        <ul>
+          <li><a href="../2. Galeria/index.html" target="_blank" rel="noopener noreferrer">🖼️ Galería</a></li>
+          <li><a href="../3. control/Estadisticas.html" target="_blank" rel="noopener noreferrer">Control</a></li>
+        </ul>
+      </nav>
+    </aside>
+
+    <div class="container">
+        <!-- SECCIÓN AGREGAR -->
+        <div class="actions">
+            <button id="addProductBtn" class="add-product-btn">➕ Añadir Producto</button>
+            <input type="text" id="search" placeholder="🔍 Buscar producto...">
+        </div>
+
+
+
+        <!-- GRID PRODUCTOS -->
+        <div class="grid" id="productGrid"></div>
+    </div>
+
+<!-- MODAL EDITAR -->
+<div class="modal" id="productModal">
+  <div class="modal-content">
+    <!-- Botón flotante para cerrar -->
+    <span class="close-span" id="closeModal">&times;</span>
+
+    <img id="modalImg" src="" alt="Vista previa del producto" />
+    <h2 id="modalTitle" class="modal-title">🛠️ Editor de Producto</h2>
+
+    <div class="modal-section">
+      <label for="editId" class="field-label">ID del producto</label>
+      <input type="text" id="editId" readonly style="background:#f3f3f3; cursor:not-allowed;">
+    </div>
+
+    <div class="modal-section">
+      <label for="editNombre" class="field-label">Nombre del Producto</label>
+      <input type="text" id="editNombre" placeholder="Ej: Perro Ranchero 🌭" />
+    </div>
+
+    <div class="modal-section">
+      <label for="editCategoria" class="field-label">Categoría</label>
+      <select id="editCategoria">
+        <option value="">(Seleccionar categoría)</option>
+        <option value="Perros">Perros 🌭</option>
+        <option value="Hamburguesas">Hamburguesas 🍔</option>
+        <option value="Salchipapas">Salchipapas 🍟</option>
+        <option value="Picadas">Picadas 🍖</option>
+        <option value="Bebidas">Bebidas 🧃</option>
+        <option value="Acompanantes">Acompañantes 🍟</option>
+        <option value="Pizzas">Pizzas 🍕</option>
+        <option value="Almuerzos">Almuerzos 🍛</option>
+      </select>
+    </div>
+
+    <div class="modal-section">
+      <label for="editConfig" class="field-label">Configuración del Producto</label>
+      <select id="editConfig">
+        <option value="">(Sin configuración)</option>
+        <option value="manualpizza">Para Pizzas 🍕</option>
+        <option value="manualalmuerzo">Para Almuerzos 🍛</option>
+      </select>
+    </div>
+
+    <div class="modal-section">
+      <label for="editPrecio" class="field-label">Precio</label>
+      <input type="number" id="editPrecio" placeholder="Ej: 12,000" />
+    </div>
+
+    <div class="modal-section">
+      <label for="editImagen" class="field-label">URL de Imagen</label>
+      <input type="text" id="editImagen" placeholder="https://..." />
+    </div>
+
+    <div class="modal-section">
+      <label for="editDescripcion" class="field-label">Descripción</label>
+      <textarea id="editDescripcion" placeholder="Escribe una breve descripción..."></textarea>
+    </div>
+
+    <div class="activo-container">
+        <label for="editActivo" class="field-label">Estado de producto</label>
+      <div class="toggle-container">
+        <input type="checkbox" id="editActivo">
+        <span id="activoLabel" class="activo-label">Activo 🟢</span>
+      </div>
+    </div>
+
+    <div class="modal-buttons">
+      <button id="saveBtn">💾 Guardar</button>
+      <button id="deleteBtn" class="delete-btn">🗑️ Eliminar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ANIMACIÓN DE CARGA -->
+<div class="loader-overlay" id="loaderOverlay">
+  <div class="loader">
+    <div class="spinner"></div>
+    <p id="loaderText">Cargando productos...</p>
+  </div>
+</div>
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>

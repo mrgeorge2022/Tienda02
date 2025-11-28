@@ -1,0 +1,1692 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Estadísticas</title>
+  <link rel="icon" type="image/png" href="../img/icono_tienda.png">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    /* ================================
+       VARIABLES / RESET (Estilo de cierre_caja.html)
+       ================================ */
+    :root {
+      --primary: #5bc0de;
+      --accent: #46b8da;
+      --muted: #909ba7;
+      --success: #63d471;
+      --warning: #f8c050;
+      --danger: #ff6b6b;
+      --bg: #1e1e2d;
+      --card: #2b2b3f;
+      --line: #4a4a68;
+      --text: #f1f1f1;
+      --input: #3c3c58;
+      --domicilio: #ff9933;
+      --radius: 12px;
+      --glass: rgba(255, 255, 255, 0.03);
+      --max-width: 1200px;
+      --shadow-1: 0 6px 20px rgba(0, 0, 0, 0.45);
+      font-size: 16px;
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html,
+    body {
+      height: 100%
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      display: flex;
+      justify-content: center;
+      padding: 18px;
+    }
+
+    /* Contenedor central */
+    .app {
+      width: 100%;
+      max-width: var(--max-width);
+      display: flex;
+      gap: 24px;
+    }
+
+    /* ================================
+       SIDEBAR
+       ================================ */
+    #sidebar {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      /* Ancho aumentado para legibilidad */
+    }
+
+    #sidebar-footer {
+      margin-top: auto;
+      padding-top: 20px;
+    }
+
+    .admin-btn {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      background: linear-gradient(135deg, #5bc0de, #2fa8c3);
+      color: #1a1a25;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+      transition: 0.2s ease-in-out;
+    }
+
+    .admin-btn:hover {
+      background: linear-gradient(135deg, #7bd9f0, #49c4dd);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.45);
+    }
+
+    #sidebar h2 {
+      margin: 0 0 16px 0;
+      font-size: 1.15rem;
+      color: var(--primary);
+      border-bottom: 1px solid var(--line);
+      padding-bottom: 12px;
+      font-weight: 800;
+    }
+
+    #sidebar nav {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 20px
+    }
+
+    /* Estilo de los tabs (botones de sección) */
+    #sidebar a.tab {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      text-decoration: none;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: background .18s, color .18s;
+      cursor: pointer;
+      /* Asegura que se vea como un botón */
+      border: 1px solid transparent;
+      /* Para mantener el layout estable */
+    }
+
+    #sidebar a.tab.active {
+      background: var(--primary);
+      color: var(--input);
+      border-color: var(--primary);
+    }
+
+    #sidebar a.tab:not(.active):hover {
+      background: var(--input);
+      color: var(--primary)
+    }
+
+    .small {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    /* ================================
+       MAIN CONTENT
+       ================================ */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+      /* Evita que el contenido se desborde en flexbox */
+    }
+
+    .card {
+      background: linear-gradient(180deg, var(--card), rgba(28, 28, 40, 0.9));
+      border-radius: var(--radius);
+      padding: 15px;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+    }
+
+    h1 {
+      margin: 0 0 10px 0;
+      color: var(--primary);
+      font-size: 1.4rem
+    }
+
+    h2 {
+      margin: 0 0 12px 0;
+      font-size: 1rem;
+      color: var(--text);
+      font-weight: 700
+    }
+
+    h4 {
+      margin: 0 0 10px 0;
+      font-size: 1.1rem;
+      color: var(--primary);
+      font-weight: 700;
+    }
+
+    /* KPIs (Resumen General) */
+    .kpis {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+
+    .kpi {
+      background: var(--glass);
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid var(--line);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+    }
+
+    .kpi h3 {
+      margin: 0;
+      color: var(--muted);
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.5px;
+    }
+
+    .kpi p {
+      margin: 8px 0 0;
+      font-weight: 800;
+      font-size: 1.5rem;
+      line-height: 1.2;
+      color: var(--text);
+    }
+
+    .kpi.ventas {
+      border-color: var(--success);
+      color: var(--success);
+    }
+
+    .kpi.promedio {
+      border-color: var(--warning);
+      color: var(--warning);
+    }
+
+    .kpi.pedidos {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Contenedor de gráficos */
+    .charts {
+      display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+      overflow-x: auto;
+    }
+
+    /* Controles de Rango */
+    .controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center
+    }
+
+    /* Botones de acción (Header) */
+    .btn {
+      padding: 12px 16px;
+      border-radius: 10px;
+      border: none;
+      font-weight: 800;
+      cursor: pointer;
+      background: var(--primary);
+      color: var(--input);
+      box-shadow: 0 8px 18px rgba(0, 0, 0, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn:hover {
+      opacity: 0.9;
+    }
+
+    /* Estilo de tablas */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      background: var(--input);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th,
+    td {
+      padding: 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+      font-size: 0.95rem;
+    }
+
+    th {
+      background: var(--primary);
+      color: var(--input);
+      text-align: center;
+      font-weight: 800;
+      position: sticky;
+      top: 0;
+    }
+
+    /* Alineación de encabezados de tablas */
+    #tablaClientesFreq th:first-child,
+    #tablaClientesGasto th:first-child,
+    #tablaProductosCantidad th:first-child,
+    #tablaProductosIngreso th:first-child {
+      text-align: left;
+    }
+
+    #tablaClientesFreq th:not(:first-child),
+    #tablaClientesGasto th:not(:first-child),
+    #tablaProductosCantidad th:not(:first-child),
+    #tablaProductosIngreso th:not(:first-child) {
+      text-align: right;
+    }
+
+    /* Alineación de datos (TD) a la derecha en la columna numérica (última columna) */
+    #tablaClientesFreq td:last-child,
+    #tablaClientesGasto td:last-child,
+    #tablaProductosCantidad td:last-child,
+    #tablaProductosIngreso td:last-child {
+      text-align: right;
+      font-weight: 700;
+    }
+
+    td {
+      text-align: left;
+      color: var(--text);
+    }
+
+    .info-box {
+      background: var(--glass);
+      padding: 12px;
+      border-radius: 8px;
+      color: var(--primary);
+      border: 1px solid var(--primary);
+      font-size: 0.9rem;
+    }
+
+    .report {
+      white-space: pre-wrap;
+      font-family: 'Consolas', 'Courier New', monospace;
+      background: var(--input);
+      padding: 15px;
+      border: 1px solid var(--line);
+    }
+
+
+    /* ================================
+       MOBILE
+       ================================ */
+    #mobile-topbar {
+      display: none;
+      position: fixed;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: 60px;
+      background: linear-gradient(90deg, #181822, #232332);
+      padding: 10px 14px;
+      align-items: center;
+      gap: 12px;
+      z-index: 1200;
+    }
+
+
+    #mobile-topbar .menu-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      border: none;
+      background: transparent;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: transform .22s ease;
+    }
+
+    @media (max-width: 899px) {
+      body {
+        padding: 12px
+      }
+
+      .app {
+        flex-direction: column
+      }
+
+      #sidebar {
+        padding: 10px;
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 100%;
+        background: #212133;
+        z-index: 1199;
+        transform: translateX(-110%);
+        overflow-y: auto;
+        box-shadow: 4px 0 20px rgba(0, 0, 0, 0.6);
+      }
+
+
+      #sidebar.active {
+        transform: translateX(0)
+      }
+
+      #mobile-topbar {
+        display: flex
+      }
+
+      .main {
+        margin-top: 72px
+      }
+
+      .top-actions {
+        flex-direction: column;
+        align-items: flex-start;
+        width: 100%;
+      }
+    }
+
+    
+
+  </style>
+</head>
+
+<body>
+  <div class="app" role="application" aria-label="Panel de Estadísticas">
+    <aside id="sidebar" aria-label="Navegación principal">
+      <h2 style="margin-bottom: 0;">Panel de Estadísticas</h2>
+      
+
+      <!-- Menú de Pestañas -->
+      <nav aria-label="Secciones" id="tabs">
+        <a href="#" class="tab nav-link active" data-section="resumen">Sumario General</a>
+        <a href="#" class="tab nav-link" data-section="clientes">Clientes VIP</a>
+        <a href="#" class="tab nav-link" data-section="productos">Productos Top</a>
+        <a href="#" class="tab nav-link" data-section="tendencias">Análisis de Picos</a>
+        <a href="#" class="tab nav-link" data-section="informe">Informe Ejecutivo</a>
+      </nav>
+
+      <div id="sidebar-footer">
+        <button class="admin-btn" onclick="window.location.href='admin.html'">
+          ⚙️ Ir al Panel Admin
+        </button>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- Barra de Menú Móvil -->
+      <div id="mobile-topbar" aria-hidden="true">
+        <button class="menu-btn" id="mobile-menu-btn" aria-label="Abrir menú">☰</button>
+        <div style="font-weight:800;color:var(--primary)">Panel de Estadísticas</div>
+      </div>
+
+      <!-- Header con Rango y Botones -->
+      <header class="card" style="padding: 18px; margin-bottom: 0;">
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px">
+          <div>
+            <h1>📈 Resumen del Período</h1>
+            <div class="small"
+        style="color:var(--muted);  padding-bottom: 12px; ">
+        Estado: <span id="estado">Cargando configuración...</span>
+      </div>
+            <div class="small" style="color:var(--muted);">Datos en tiempo real / Rango: <span id="rangoLabel">Últimos
+                30 días</span></div>
+          </div>
+
+          <div class="top-actions">
+            <div class="controls"
+              style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center; justify-content: flex-end;">
+              <select id="rangoRapido"
+                style="padding: 8px; border-radius: 6px; background: var(--input); color: var(--text); border: 1px solid var(--line); font-weight: 700;">
+                <option value="7">Últimos 7 días</option>
+                <option value="30">Últimos 30 días</option>
+                <option value="90">Últimos 90 días</option>
+                <option value="todo" selected>Todo</option>
+                <option value="personalizado">Rango Específico</option>
+              </select>
+
+              <div id="rangoPersonalizado" style="display: none; gap: 8px; align-items: center;">
+                <label class="small" for="fechaInicio" style="color: var(--muted);">Inicio:</label>
+                <input type="date" id="fechaInicio"
+                  style="padding: 8px; border-radius: 6px; background: var(--input); color: var(--text); border: 1px solid var(--line); font-weight: 700;">
+
+                <label class="small" for="fechaFin" style="color: var(--muted);">Fin:</label>
+                <input type="date" id="fechaFin"
+                  style="padding: 8px; border-radius: 6px; background: var(--input); color: var(--text); border: 1px solid var(--line); font-weight: 700;">
+
+                <button id="btnAplicarRango" class="btn"
+                  style="padding: 8px 12px; background: var(--accent);">Aplicar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="top-actions" style="margin-top: 10px;">
+          <button id="btnRecargar" class="btn" style="background: var(--success);">🔃 Recargar Datos</button>
+          <button id="btnExport" class="btn" style="background: var(--warning); color: var(--input);">⬇️ Exportar
+            Resumen CSV</button>
+        </div>
+      </header>
+
+      <!-- =================================== -->
+      <!-- SECCIÓN 1: SUMARIO GENERAL (Visible) -->
+      <!-- =================================== -->
+      <section id="resumen" class="section card" style="display:block;">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Resumen General del Periodo</strong>
+          <div class="small">Última actualización: <span id="ultimaAct">—</span></div>
+        </div>
+
+        <!-- 1. Resumen General (KPIs) -->
+        <div class="kpis" style="margin-top:15px">
+          <div class="kpi pedidos">
+            <h3>Total Pedidos</h3>
+            <p id="k_totalPedidos">—</p>
+          </div>
+          <div class="kpi ventas">
+            <h3>Total Vendido</h3>
+            <p id="k_totalVentas">—</p>
+          </div>
+          <div class="kpi promedio">
+            <h3>Promedio por Pedido</h3>
+            <p id="k_promedio">—</p>
+          </div>
+          <div class="kpi pedidos">
+            <h3>Clientes Únicos</h3>
+            <p id="k_clientesUnicos">—</p>
+          </div>
+          <div class="kpi promedio">
+            <h3>Domicilios</h3>
+            <p id="k_costoDomicilio">—</p>
+          </div>
+        </div>
+
+        <!-- 2. Tendencias Clave -->
+        <div class="card" style="margin-top:15px;">
+          <h4>🚀 Tendencias Clave</h4>
+          <ul class="small" id="tendenciasRapidas" style="list-style: none; padding-left: 0;">
+            <li>📆 Pedidos promedio por día: <span id="t_pedidosDia">—</span></li>
+            <li>💸 Ticket promedio: <span id="t_ticketProm">—</span></li>
+            <li>📈 Variación de ventas (vs. periodo anterior): <span id="t_varVentas" style="font-weight:bold;">—</span>
+            </li>
+            <li>🕒 Hora pico de pedidos: <span id="t_horaPico">—</span></li>
+          </ul>
+        </div>
+
+        <!-- 3, 4, 5, 6: Gráficos -->
+        <div class="charts">
+          <!-- 3. Tendencia de ventas diarias (Curva) -->
+          <div class="card">
+            <canvas id="chartVentasDia"></canvas>
+          </div>
+          <!-- 4. Concentración de pedidos por hora (Barras) -->
+          <div class="card">
+            <canvas id="chartVentasHora"></canvas>
+          </div>
+          <!-- 5. Distribución por tipo de entrega (Donut) -->
+          <div class="card">
+            <canvas id="chartTipoEntrega"></canvas>
+          </div>
+          <!-- 6. Distribución por método de pago (Donut) -->
+          <div class="card">
+            <canvas id="chartMetodoPago"></canvas>
+          </div>
+        </div>
+
+
+      </section>
+
+      <!-- =================================== -->
+      <!-- SECCIÓN 2: CLIENTES VIP (Oculta) -->
+      <!-- =================================== -->
+      <section id="clientes" class="section card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Clientes - Rankings Top 50</strong>
+          <div>
+            <button id="exportClientes" class="btn" style="background: var(--warning); color: var(--input);">Exportar
+              Clientes CSV</button>
+          </div>
+        </div>
+
+        <div style="margin-top:12px" class="info-box">
+          Análisis de clientes por **frecuencia de pedidos** y **gasto total acumulado** en el periodo.
+        </div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:15px;margin-top:15px">
+          <div class="card">
+            <h4>🥇 Top Clientes por Frecuencia</h4>
+            <table id="tablaClientesFreq">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Teléfono</th>
+                  <th>Pedidos</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <h4>💰 Top Clientes por Gasto Total</h4>
+            <table id="tablaClientesGasto">
+              <thead>
+                <tr>
+                  <th>Cliente</th>
+                  <th>Teléfono</th>
+                  <th>Gasto</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================== -->
+      <!-- SECCIÓN 3: PRODUCTOS TOP (Oculta) -->
+      <!-- =================================== -->
+      <section id="productos" class="section card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Productos Top 100</strong>
+          <div><button id="exportProductos" class="btn"
+              style="background: var(--warning); color: var(--input);">Exportar Productos CSV</button></div>
+        </div>
+
+        <div style="margin-top:12px" class="info-box">Ranking por **cantidad de unidades vendidas** y por
+          **ingresos estimados** (calculados del precio).</div>
+
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:15px;margin-top:15px">
+          <div class="card">
+            <h4>📦 Top Productos (Cantidad)</h4>
+            <table id="tablaProductosCantidad">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Cantidad</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+
+          <div class="card">
+            <h4>💵 Top Productos (Ingresos Totales)</h4>
+            <table id="tablaProductosIngreso">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Ingreso</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- =================================== -->
+      <!-- SECCIÓN 4: ANÁLISIS DE PICOS (Oculta) -->
+      <!-- =================================== -->
+      <section id="tendencias" class="section card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Análisis de Días y Productos</strong>
+          <div class="small">Identificación de **días de alto rendimiento** y **productos con mayor impacto**.
+          </div>
+        </div>
+
+        <div style="margin-top:15px" class="charts">
+          <div class="card">
+            <canvas id="chartDiaSemana"></canvas>
+          </div>
+          <div class="card">
+            <canvas id="chartTopProductos"></canvas>
+          </div>
+        </div>
+
+        <div style="margin-top:15px" class="card">
+          <h4>📊 Estadísticas Detalladas del Periodo</h4>
+          <pre id="extraStats" class="report small">Cargando...</pre>
+        </div>
+      </section>
+
+      <!-- =================================== -->
+      <!-- SECCIÓN 5: INFORME (Oculta) -->
+      <!-- =================================== -->
+      <section id="informe" class="section card" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong>Informe Ejecutivo Automático</strong>
+          <div><button id="btnCopiar" class="btn" style="background: var(--primary); color: var(--input);">Copiar
+              Informe</button></div>
+        </div>
+
+        <div style="margin-top:12px" class="info-box report" id="informeText">Generando informe...</div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // 1. VARIABLE API_URL DECLARADA PARA SER ASIGNADA DESDE config.json
+    let API_URL = '';
+
+    // Registrar plugins de Chart.js
+    Chart.register(ChartDataLabels);
+    // Colores globales de Chart.js
+// Colores globales de Chart.js
+Chart.defaults.color = '#fff5';
+Chart.defaults.borderColor = '#3c3c58'; // ✅ CAMBIO: Usamos el gris claro (muted) para las líneas y la cuadrícula.
+    // ---------- utilidades ----------
+    const fmtCOP = n => (Number(n) || 0).toLocaleString('es-CO', {
+      style: 'currency',
+      currency: 'COP',
+      minimumFractionDigits: 0
+    });
+    const q = s => document.querySelector(s);
+    const qAll = s => Array.from(document.querySelectorAll(s));
+
+    let RAW_PEDIDOS = [];
+    let charts = [];
+    let statsGlobal; // Variable para almacenar las estadísticas y usarlas en exportaciones
+
+    // NUEVA VARIABLE GLOBAL: Estado del rango de fechas activo
+    let RANGO_ACTUAL = { days: 'todo' };
+
+
+    // pestañas
+    qAll('.tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        qAll('.tab').forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        qAll('.section').forEach(s => s.style.display = 'none');
+        const targetSection = q('#' + tab.dataset.section);
+        if (targetSection) targetSection.style.display = 'block';
+        window.scrollTo({
+          top: 0,
+          behavior: 'smooth'
+        });
+      });
+    });
+
+    // =================================================================
+    // FUNCIÓN CRÍTICA DE CARGA DE DATOS (AJUSTADA PARA RANGO INICIO/FIN)
+    // =================================================================
+    /**
+     * Carga datos de la API y los filtra.
+     * @param {Object} filterOptions - { days: '7'|'30'|'90'|'todo' } o { start: Date, end: Date }.
+     * @returns {Array} Lista de pedidos filtrados.
+     */
+    async function loadRealData(filterOptions) {
+      if (!API_URL) throw new Error("API_URL no está configurada. Revise config.json.");
+
+      const res = await fetch(API_URL + '?t=' + Date.now());
+      const allPedidos = await res.json();
+      if (!Array.isArray(allPedidos)) throw new Error('Respuesta API no es un array de pedidos');
+
+      // --- Lógica de Limpieza de Datos Original se mantiene ---
+      const dataPedidos = allPedidos.filter(p => {
+        if (p.tipoEntrega && p.tipoEntrega.toString().toLowerCase() === 'tipoentrega') {
+          return false;
+        }
+        const hasFactura = p.numeroFactura && p.numeroFactura.toString().trim() !== '';
+        const hasTotal = p.totalPagar !== null && p.totalPagar !== undefined && p.totalPagar !== '';
+        if (!hasFactura && !hasTotal) {
+          return false;
+        }
+        return true;
+      });
+
+      RAW_PEDIDOS = Array.from(dataPedidos);
+
+      // --- Lógica de Filtrado por Rango (Modificada) ---
+      const filtrados = RAW_PEDIDOS.filter(p => {
+        if (!p.fecha) return false;
+        const dt = parseFechaDDMMYYYY(p.fecha);
+        if (!dt) return false;
+
+        // Caso "Todo"
+        if (filterOptions.days === 'todo') {
+          return true;
+        }
+
+        // Caso de Días Fijos (7, 30, 90)
+        if (filterOptions.days) {
+          const dias = Number(filterOptions.days);
+          const hoy = new Date();
+          hoy.setHours(0, 0, 0, 0);
+          const diff = (hoy - dt) / (1000 * 60 * 60 * 24);
+          return diff >= 0 && diff < dias;
+        }
+
+        // Caso de Rango Personalizado (Inicio y Fin)
+if (filterOptions.start instanceof Date && filterOptions.end instanceof Date) {
+            
+            // 🔥 COMPARACIÓN ESTRICTA: Usamos getTime() para comparar las marcas de tiempo
+            //    y asegurarnos de que la fecha del pedido esté entre los límites.
+            const pedidoTime = dt.getTime();
+            const startTime = filterOptions.start.getTime(); // 00:00:00 Local
+            const endTime = filterOptions.end.getTime();     // 23:59:59.999 Local
+
+            return pedidoTime >= startTime && pedidoTime <= endTime;
+        }
+
+        return false;
+      });
+
+      return filtrados;
+    }
+
+function parseFechaDDMMYYYY(fechaStr) {
+    if (!fechaStr) return null;
+
+    // Intenta formato d/m/yyyy o dd/mm/yyyy (formato común de Google Sheets en español)
+    if (fechaStr.includes('/')) {
+        const partes = fechaStr.split('/');
+        if (partes.length === 3) {
+            const d = Number(partes[0]);
+            const m = Number(partes[1]);
+            const y = Number(partes[2]);
+            
+            // CREAR LA FECHA COMO LOCAL A MEDIANOCHE (00:00:00)
+            if (y > 2020 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+                // ✅ CAMBIO CLAVE: USAMOS EL CONSTRUCTOR LOCAL
+                const dt = new Date(y, m - 1, d); 
+                
+                // Si es una fecha válida, la devolvemos
+                if (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d) return dt;
+            }
+        }
+    }
+    // Si la fecha está en formato YYYY-MM-DD (de un input HTML)
+    else if (fechaStr.includes('-')) {
+        const [y, m, d] = fechaStr.split('-').map(Number);
+        if (y > 2020 && m >= 1 && m <= 12 && d >= 1 && d <= 31) {
+            // CREAR LA FECHA COMO LOCAL A MEDIANOCHE (00:00:00)
+            const dt = new Date(y, m - 1, d);
+            if (dt.getFullYear() === y && dt.getMonth() === m - 1 && dt.getDate() === d) return dt;
+        }
+    }
+    
+    return null;
+}
+
+
+    // ---------- lógica de cálculo de productos (LIMPIEZA AVANZADA) ----------
+    function normalizeProductName(linea) {
+      if (!linea) return null;
+      let cleanLine = String(linea).trim().replace(/^\d+\.\s*/, '').replace(/[\r\n]/g, ' ').replace(/\s{2,}/g, ' ');
+
+      let cantidad = 1;
+      let precioEstimado = 0;
+
+      // Patrones para cantidad: "2x Producto" o "Producto x3"
+      let cantMatch = cleanLine.match(/^(\d+)\s*[xX]\s*(.*)/); // 2x Product Name
+      if (cantMatch) {
+        cantidad = Number(cantMatch[1]);
+        cleanLine = cantMatch[2].trim();
+      } else {
+        cantMatch = cleanLine.match(/(.*)\s*[xX]\s*(\d+)$/); // Product Name x3
+        if (cantMatch) {
+          cantidad = Number(cantMatch[2]);
+          cleanLine = cantMatch[1].trim();
+        }
+      }
+
+      // 2. Extraer Precio (PRIORIDAD: FORMATO NUEVO " - $DIGITOS")
+      // Busca ($PRECIO) o - $PRECIO
+      let precioMatch = cleanLine.match(/\(\s*\$?([\d\s\.,]+)\s*\)$/); // ($PRECIO)
+
+      if (!precioMatch) {
+        precioMatch = cleanLine.match(/\s+\-\s*\$?([\d\s\.,]+)$/); // - $PRECIO
+      }
+
+      if (precioMatch) {
+        const precioStr = precioMatch[1] || '0';
+        precioEstimado = Number(precioStr.replace(/[^0-9]/g, ''));
+        cleanLine = cleanLine.replace(precioMatch[0], '').trim();
+      }
+
+      // 3. Limpiar Nombre final
+      let nombreProd = cleanLine.split(' - ')[0].trim(); // Quita cualquier remanente después de un guion
+
+      // Limpieza final de patrones de cantidad (por si acaso)
+      nombreProd = nombreProd.replace(/\s*[xX]\s*\d+\s*/, '').trim();
+      nombreProd = nombreProd.replace(/\s*\d+\s*[xX]\s*/, '').trim();
+
+      nombreProd = nombreProd.replace(/\s{2,}/g, ' ').trim(); // Quita espacios dobles
+
+      // Quita observaciones finales entre paréntesis si el precio no estaba allí
+      if (!precioMatch) {
+        nombreProd = nombreProd.replace(/\s*\(.*\)$/, '').trim();
+      }
+
+      if (!nombreProd) nombreProd = 'Producto Desconocido';
+
+      return {
+        nombre: nombreProd,
+        cantidad: cantidad,
+        precioEstimado: precioEstimado
+      };
+    }
+
+    function analyze(pedidos) {
+      // resultados agregados
+      const resumen = {
+        totalPedidos: pedidos.length,
+        totalVentas: 0,
+        subtotalSum: 0,
+        costoDomicilioSum: 0,
+        clientes: {},
+        productos: {},
+        ventasPorFecha: {},
+        pedidosPorHora: Array(24).fill(0),
+        diaSemana: Array(7).fill(0), // [Dom, Lun, Mar, Mie, Jue, Vie, Sab]
+        tiposEntrega: {
+          Domicilio: 0,
+          Mesa: 0,
+          "Recoger en Tienda": 0,
+          Otro: 0
+        },
+        metodosPago: {},
+        ventasPorDiaHora: Array.from({
+          length: 7
+        }, () => Array(24).fill(0)) // Para el heatmap
+      };
+
+      pedidos.forEach(p => {
+        // Normalizar campos y obtener valores numéricos
+        const totalPagar = Number(p.totalPagar) || 0;
+        resumen.totalVentas += totalPagar;
+        resumen.costoDomicilioSum += Number(p.costoDomicilio || 0) || 0;
+
+
+
+        // cliente
+        let nombre = (p.nombre || '').trim() || 'Cliente desconocido';
+        let tel = String(p.telefono || '').trim().replace(/[^0-9+]/g, '');
+        if (tel === '' || tel.toLowerCase() === 'null') tel = '—';
+        const claveCliente = `${nombre} (${tel})`;
+        resumen.clientes[claveCliente] = resumen.clientes[claveCliente] ? {
+          pedidos: resumen.clientes[claveCliente].pedidos + 1,
+          gasto: resumen.clientes[claveCliente].gasto + totalPagar
+        } : {
+          pedidos: 1,
+          gasto: totalPagar
+        };
+
+        // productos (Lectura desde la columna 'productos' o 'items')
+        const rawItems = String(p.productos || p.items || '').trim();
+        if (rawItems) {
+          rawItems.split('\n').forEach(linea => {
+            if (!linea.trim()) return;
+            const item = normalizeProductName(linea);
+
+            if (item && item.nombre && item.nombre !== 'Producto Desconocido') {
+              const clave = item.nombre.toLowerCase();
+              resumen.productos[clave] = resumen.productos[clave] || {
+                nombre: item.nombre,
+                cantidad: 0,
+                ingreso: 0
+              };
+              resumen.productos[clave].cantidad += item.cantidad;
+              resumen.productos[clave].ingreso += item.precioEstimado * item.cantidad;
+            }
+          });
+        }
+
+
+        // ventas por fecha
+        if (p.fecha) {
+          resumen.ventasPorFecha[p.fecha] = (resumen.ventasPorFecha[p.fecha] || 0) + totalPagar;
+        }
+
+        // hora
+        let hh = 0;
+        if (p.hora) {
+          hh = Number(String(p.hora).split(':')[0]) || 0;
+          if (hh >= 0 && hh <= 23) {
+            resumen.pedidosPorHora[hh] += 1;
+          }
+        }
+
+        // dia semana
+        const dt = parseFechaDDMMYYYY(p.fecha);
+        if (dt) {
+          const diaIndex = dt.getDay();
+          resumen.diaSemana[diaIndex] += totalPagar;
+          if (hh >= 0 && hh <= 23) {
+            resumen.ventasPorDiaHora[diaIndex][hh] += totalPagar; // Heatmap
+          }
+        }
+
+        // tipo entrega (normalizado)
+        const te = (p.tipoEntrega || '').toLowerCase().trim();
+        if (te.includes("domicilio")) resumen.tiposEntrega["Domicilio"]++;
+        else if (te.includes("mesa")) resumen.tiposEntrega["Mesa"]++;
+        else if (te.includes("recoger") || te.includes("tienda")) resumen.tiposEntrega["Recoger en Tienda"]++;
+        else resumen.tiposEntrega["Otro"]++;
+
+
+        // metodo de pago
+        const mp = (p.metodoPago || 'Desconocido').toString().trim();
+        resumen.metodosPago[mp] = (resumen.metodosPago[mp] || 0) + totalPagar;
+      });
+
+      // ordenar y calcular
+      const clientesArr = Object.entries(resumen.clientes).map(([k, v]) => {
+        const match = k.match(/\((.*?)\)/);
+        return {
+          cliente: k.replace(/\s+\(.*?\)/, '').trim(),
+          telefono: match ? match[1] : '—',
+          pedidos: v.pedidos,
+          gasto: v.gasto
+        };
+      }).sort((a, b) => b.pedidos - a.pedidos);
+
+      const clientesPorGasto = Object.entries(resumen.clientes).map(([k, v]) => {
+        const match = k.match(/\((.*?)\)/);
+        return {
+          cliente: k.replace(/\s+\(.*?\)/, '').trim(),
+          telefono: match ? match[1] : '—',
+          pedidos: v.pedidos,
+          gasto: v.gasto
+        };
+      }).sort((a, b) => b.gasto - a.gasto);
+
+      const productosArr = Object.values(resumen.productos).sort((a, b) => b.cantidad - a.cantidad);
+      const productosPorIngreso = Object.values(resumen.productos).sort((a, b) => b.ingreso - a.ingreso);
+
+      return {
+        resumen,
+        clientesArr,
+        clientesPorGasto,
+        productosArr,
+        productosPorIngreso
+      };
+    }
+
+    // ---------- UI render (Gráficos y Tablas) ----------
+    function renderResumen(stats) {
+      const r = stats.resumen;
+      q('#k_totalPedidos').textContent = r.totalPedidos;
+      q('#k_totalVentas').textContent = fmtCOP(r.totalVentas);
+      const promedio = r.totalPedidos ? (r.totalVentas / r.totalPedidos) : 0;
+      q('#k_promedio').textContent = fmtCOP(promedio);
+      q('#k_clientesUnicos').textContent = Object.keys(r.clientes).length;
+      q('#k_costoDomicilio').textContent = fmtCOP(r.costoDomicilioSum);
+
+      // === TENDENCIAS RÁPIDAS ===
+      const diasAnalizados = Object.keys(r.ventasPorFecha).length || 1;
+      const pedidosPorDia = r.totalPedidos / diasAnalizados;
+      const ticketProm = promedio;
+
+      const maxPedidos = Math.max(...r.pedidosPorHora);
+      const maxHoraIndex = r.pedidosPorHora.findIndex(p => p === maxPedidos);
+      const horaPico = `${String(maxHoraIndex).padStart(2, '0')}:00 (${maxPedidos} pedidos)`;
+
+      // Comparativa con Periodo Anterior
+      const rangoActual = RANGO_ACTUAL;
+      let prevVentas = 0;
+
+      // Solo compara si el rango es por días fijos
+      if (rangoActual.days && rangoActual.days !== 'todo' && !isNaN(Number(rangoActual.days))) {
+        const dias = Number(rangoActual.days);
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+
+        // El periodo anterior comienza el día (hoy - 2*dias + 1) y termina (hoy - dias)
+        const startPrev = new Date();
+        startPrev.setDate(hoy.getDate() - dias * 2 + 1);
+        startPrev.setHours(0, 0, 0, 0);
+
+        const endPrev = new Date();
+        endPrev.setDate(hoy.getDate() - dias);
+        endPrev.setHours(23, 59, 59, 999);
+
+        RAW_PEDIDOS.forEach(p => {
+          const dt = parseFechaDDMMYYYY(p.fecha);
+          if (!dt) return;
+          // Usamos las fechas sin ajustar la hora para la comparación
+          if (dt.getTime() >= startPrev.getTime() && dt.getTime() <= endPrev.getTime()) {
+            prevVentas += Number(p.totalPagar || 0);
+          }
+        });
+      }
+
+      let variacionText = '—';
+      if (rangoActual.days && rangoActual.days !== 'todo' && prevVentas > 0) {
+        const growth = (((r.totalVentas - prevVentas) / prevVentas) * 100);
+        const sign = growth >= 0 ? '▲' : '▼';
+        const color = growth >= 0 ? 'var(--success)' : 'var(--danger)';
+        variacionText = `<span style="color:${color}">${sign} ${Math.abs(growth).toFixed(1)}%</span>`;
+      } else if (r.totalVentas > 0 && (rangoActual.days && rangoActual.days !== 'todo')) {
+        variacionText = '<span style="color:var(--warning)">N/A (vs 0)</span>';
+      } else if (rangoActual.start) {
+        // En rango personalizado, no se calcula la variación de forma automática
+        variacionText = 'N/A (Rango Fijo)';
+      }
+
+      q('#t_pedidosDia').textContent = pedidosPorDia.toFixed(1);
+      q('#t_ticketProm').textContent = fmtCOP(ticketProm);
+      q('#t_varVentas').innerHTML = variacionText;
+      q('#t_horaPico').textContent = horaPico;
+
+      // charts
+      destroyCharts();
+
+      const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              color: '#909ba7'
+            }
+          },
+          title: {
+            display: true,
+            color: 'var(--text)'
+          }
+        }
+      };
+
+      // 3. Line Chart: Ventas por Día (Curva)
+      const ventasArr = Object.entries(r.ventasPorFecha).sort(([fechaA], [fechaB]) => {
+        const da = parseFechaDDMMYYYY(fechaA),
+          db = parseFechaDDMMYYYY(fechaB);
+        return (da?.getTime() || 0) - (db?.getTime() || 0);
+      });
+      const vpdLabels = ventasArr.map(([f]) => f.substring(0, 5)); // Mostrar solo MM-DD
+      const vpdData = ventasArr.map(([, v]) => v);
+      charts.push(new Chart(q('#chartVentasDia'), {
+type: 'line',
+        data: {
+            labels: vpdLabels,
+datasets: [{
+                label: 'Ventas Diarias',
+                data: vpdData,
+                borderColor: '#8CC63F', // 🍏 VERDE MANZANA para la línea
+                backgroundColor: 'rgba(140, 198, 63, 0.3)', // VERDE MANZANA con 30% de transparencia para el relleno
+                fill: true,
+                tension: 0.3
+            }]
+        },
+options: {
+          ...chartOptions,
+          plugins: {
+            ...chartOptions.plugins,
+            title: {
+              ...chartOptions.plugins.title,
+              text: 'Tendencia de Ventas por Día',
+              color: '#909ba7',
+            }
+          }
+        }
+      }));
+
+      // 4. Bar Chart: Pedidos por Hora
+      charts.push(new Chart(q('#chartVentasHora'), {
+        type: 'bar',
+        data: {
+          labels: Array.from({
+            length: 24
+          }, (_, i) => String(i).padStart(2, '0') + ':00'),
+          datasets: [{
+            label: 'Pedidos por hora',
+            data: r.pedidosPorHora,
+backgroundColor: generateColors(24)          }]
+        },
+        options: {
+          ...chartOptions,
+          plugins: {
+            ...chartOptions.plugins,
+            legend: {
+              display: false
+            },
+            title: {
+              ...chartOptions.plugins.title,
+              text: 'Pico de Pedidos por Hora',
+              color: '#909ba7'
+            }
+          }
+        }
+      }));
+
+      // 5. Donut Chart: Tipo de Entrega
+      const teLabels = Object.keys(r.tiposEntrega).filter(k => r.tiposEntrega[k] > 0);
+      const teData = teLabels.map(k => r.tiposEntrega[k]);
+      charts.push(new Chart(q('#chartTipoEntrega'), {
+        type: 'doughnut',
+        data: {
+          labels: teLabels,
+          datasets: [{
+            data: teData,
+            backgroundColor: generateColors(teLabels.length)
+          }]
+        },
+        options: {
+          ...chartOptions,
+          plugins: {
+            ...chartOptions.plugins,
+            title: {
+              ...chartOptions.plugins.title,
+              text: 'Distribución por Tipo de Entrega',
+                            color: '#909ba7'
+            }
+          }
+        }
+      }));
+
+      // 6. Donut Chart: Método de Pago
+      const mpLabels = Object.keys(r.metodosPago).filter(k => r.metodosPago[k] > 0);
+      const mpData = mpLabels.map(k => r.metodosPago[k]);
+      charts.push(new Chart(q('#chartMetodoPago'), {
+        type: 'doughnut',
+        data: {
+          labels: mpLabels,
+          datasets: [{
+            data: mpData,
+            backgroundColor: generateColors(mpLabels.length)
+          }]
+        },
+        options: {
+          ...chartOptions,
+          plugins: {
+            ...chartOptions.plugins,
+            title: {
+              ...chartOptions.plugins.title,
+              text: 'Distribución por Método de Pago',
+                            color: '#909ba7'
+            }
+          }
+        }
+      }));
+
+    }
+
+    // helpers
+    function destroyCharts() {
+      charts.forEach(c => {
+        if (c && c.destroy) c.destroy();
+      });
+      charts = [];
+    }
+
+    function generateColors(n) {
+      const pal = ['#5bc0de', '#63d471', '#f8c050', '#ff6b6b', '#909ba7', '#7abbff', '#46b8da', '#e83e8c', '#6c757d', '#00bcd4'];
+      const out = [];
+      for (let i = 0; i < n; i++) out.push(pal[i % pal.length]);
+      return out;
+    }
+
+    // render tablas clientes/productos
+    function renderClientesTables(stats) {
+      const cf = stats.clientesArr.slice(0, 50);
+      const cg = stats.clientesPorGasto.slice(0, 50);
+      q('#tablaClientesFreq tbody').innerHTML = cf.map((c, i) => `<tr><td>${i + 1}. ${escapeHtml(c.cliente)}</td><td>${c.telefono}</td><td>${c.pedidos}</td></tr>`).join('');
+      q('#tablaClientesGasto tbody').innerHTML = cg.map((c, i) => `<tr><td>${i + 1}. ${escapeHtml(c.cliente)}</td><td>${c.telefono}</td><td>${fmtCOP(c.gasto)}</td></tr>`).join('');
+    }
+
+    function renderProductosTables(stats) {
+      const pq = stats.productosArr;
+      const pi = stats.productosPorIngreso;
+
+      if (pq.length === 0) {
+        q('#tablaProductosCantidad tbody').innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay datos de productos en este rango.</td></tr>';
+      } else {
+        q('#tablaProductosCantidad tbody').innerHTML = pq.slice(0, 100).map((p, i) => `<tr><td>${i + 1}. ${escapeHtml(p.nombre)}</td><td>${p.cantidad}</td></tr>`).join('');
+      }
+
+      if (pi.length === 0) {
+        q('#tablaProductosIngreso tbody').innerHTML = '<tr><td colspan="2" style="text-align:center;">No hay datos de ingresos de productos en este rango.</td></tr>';
+      } else {
+        q('#tablaProductosIngreso tbody').innerHTML = pi.slice(0, 100).map((p, i) => `<tr><td>${i + 1}. ${escapeHtml(p.nombre)}</td><td>${fmtCOP(p.ingreso)}</td></tr>`).join('');
+      }
+    }
+
+
+    // tendencias charts + extra stats + report
+    function renderTendencias(stats) {
+      const r = stats.resumen;
+
+      // Bar Chart: Día de Semana
+      const diaLabels = ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'];
+      const diaData = diaLabels.map((_, i) => r.diaSemana[i] || 0);
+      charts.push(new Chart(q('#chartDiaSemana'), {
+        type: 'bar',
+        data: {
+          labels: diaLabels,
+          datasets: [{
+            label: 'Ventas por día de la semana',
+            data: diaData,
+            backgroundColor: '#7abaff'
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: 'Ventas Totales por Día de la Semana',
+              color: '#909ba7'
+            }
+          },
+          scales: {
+            y: {
+              ticks: {
+                callback: fmtCOP
+              }
+            }
+          }
+        }
+      }));
+
+      // Horizontal Bar Chart: Top Productos
+      const topP = stats.productosArr.slice(0, 10);
+      charts.push(new Chart(q('#chartTopProductos'), {
+        type: 'bar',
+        data: {
+          labels: topP.map(p => p.nombre),
+          datasets: [{
+            label: 'Cantidad Vendida',
+            data: topP.map(p => p.cantidad),
+            backgroundColor: generateColors(10)
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          plugins: {
+            legend: {
+              display: false
+            },
+            title: {
+              display: true,
+              text: 'Top 10 Productos por Cantidad Vendida',
+              color: '#909ba7'
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: true
+            }
+          }
+        }
+      }));
+
+      // extra stats text
+      const totalVentas = r.totalVentas;
+      const promedio = r.totalPedidos ? totalVentas / r.totalPedidos : 0;
+      const clientesUnicos = Object.keys(r.clientes).length;
+      q('#extraStats').textContent =
+        `Resumen Financiero y Operacional:
+
+Total Ventas: ${fmtCOP(totalVentas)}
+Total Pedidos: ${r.totalPedidos}
+Ticket Promedio por Pedido: ${fmtCOP(promedio)}
+
+Clientes Únicos Registrados: ${clientesUnicos}
+Costo Total de Domicilios: ${fmtCOP(r.costoDomicilioSum)}
+`;
+    }
+
+    // informe automático 
+    function generarInforme(stats) {
+      const r = stats.resumen;
+      const rangoActual = RANGO_ACTUAL;
+      let periodoDias = rangoActual.days === 'todo' ? null : Number(rangoActual.days);
+
+      // construir texto
+      let texto = `📊 INFORME EJECUTIVO DE ESTADÍSTICAS\n\n`;
+      texto += `Fecha de Generación: ${new Date().toLocaleString()}\n`;
+      texto += `Período Analizado: ${q('#rangoLabel').textContent}\n`;
+      texto += `--------------------------------------------------\n`;
+      texto += `\n🎯 **Resumen de Alto Nivel:**\n`;
+      texto += `Total Pedidos: ${r.totalPedidos}\n`;
+      texto += `Total Ventas: ${fmtCOP(r.totalVentas)}\n`;
+      texto += `Ticket Promedio por pedido: ${fmtCOP(r.totalVentas / (r.totalPedidos || 1))}\n`;
+      texto += `Clientes Únicos: ${Object.keys(r.clientes).length}\n`;
+
+      const topCliente = stats.clientesArr[0];
+      if (topCliente) texto +=
+        `\n🥇 Cliente Más Frecuente: ${topCliente.cliente} (${topCliente.telefono}) — ${topCliente.pedidos} pedidos.\n`;
+      const topProd = stats.productosArr[0];
+      if (topProd) texto +=
+        `\n📦 Producto Top (Cantidad): ${topProd.nombre} — ${topProd.cantidad} unidades.\n`;
+      const topProdIngreso = stats.productosPorIngreso[0];
+      if (topProdIngreso) texto +=
+        `💵 Producto Top (Ingreso): ${topProdIngreso.nombre} — ingresos ${fmtCOP(topProdIngreso.ingreso)}.\n`;
+
+      // tipo de entrega dominante
+      const maxEntrega = Object.entries(r.tiposEntrega).filter(([, count]) => count > 0).sort((a, b) => b[1] -
+        a[1])[0];
+      if (maxEntrega) texto +=
+        `\n🚚 Tipo de Entrega Dominante: ${maxEntrega[0]} (${maxEntrega[1]} pedidos).\n`;
+
+      // método de pago dominante
+      const maxPago = Object.entries(r.metodosPago).filter(([, count]) => count > 0).sort((a, b) => b[1] - a[1])[0];
+      if (maxPago) texto += `💳 Método de Pago Más Usado: ${maxPago[0]} (Aprox. ${fmtCOP(maxPago[1])}).\n`;
+
+      // variación con periodo anterior (si aplica)
+      if (rangoActual.days && rangoActual.days !== 'todo' && periodoDias) {
+        const hoy = new Date();
+        hoy.setHours(0, 0, 0, 0);
+        const start = new Date();
+        start.setDate(hoy.getDate() - periodoDias + 1);
+
+        const prevStart = new Date();
+        prevStart.setDate(start.getDate() - periodoDias);
+        prevStart.setHours(0, 0, 0, 0);
+
+        const prevEnd = new Date();
+        prevEnd.setDate(start.getDate() - 1);
+        prevEnd.setHours(23, 59, 59, 999);
+
+
+        let prevVentas = 0,
+          prevPedidos = 0;
+        RAW_PEDIDOS.forEach(p => {
+          const dt = parseFechaDDMMYYYY(p.fecha);
+          if (!dt) return;
+          if (dt.getTime() >= prevStart.getTime() && dt.getTime() <= prevEnd.getTime()) {
+            prevVentas += Number(p.totalPagar || 0);
+            prevPedidos++;
+          }
+        });
+
+        const growthVentas = prevVentas ? ((r.totalVentas - prevVentas) / prevVentas) * 100 : null;
+        const growthPedidos = prevPedidos ? ((r.totalPedidos - prevPedidos) / prevPedidos) * 100 : null;
+
+        texto += `\n--------------------------------------------------\n`;
+        texto += `📈 **Comparativa con Periodo Anterior:**\n`;
+        texto += `Período Prev: ${prevStart.toLocaleDateString()} → ${prevEnd.toLocaleDateString()}\n`;
+        if (prevVentas > 0) {
+          const vsVentas = growthVentas >= 0 ? `▲ +${growthVentas.toFixed(1)}%` :
+            `▼ ${growthVentas.toFixed(1)}%`;
+          const vsPedidos = growthPedidos >= 0 ? `▲ +${growthPedidos.toFixed(1)}%` :
+            `▼ ${growthPedidos.toFixed(1)}%`;
+          texto += `Ventas: ${fmtCOP(r.totalVentas)} (vs ${fmtCOP(prevVentas)} previo. Variación: ${vsVentas})\n`;
+          texto += `Pedidos: ${r.totalPedidos} (vs ${prevPedidos} previo. Variación: ${vsPedidos})\n`;
+        } else if (r.totalVentas > 0) {
+          texto +=
+            `Ventas: ${fmtCOP(r.totalVentas)}. No hay datos en el periodo anterior para comparar.\n`;
+        } else {
+          texto += `No hay suficientes datos para una comparativa significativa.\n`;
+        }
+      } else if (rangoActual.start) {
+        texto += `\n--------------------------------------------------\n`;
+        texto += `📈 **Comparativa con Periodo Anterior:**\n`;
+        texto += `N/A: El rango es personalizado (Fecha Inicio/Fin) y no tiene un periodo anterior predefinido.\n`;
+      }
+
+      q('#informeText').textContent = texto;
+    }
+
+    // ---------- export CSV ----------
+    function exportTableToCSV(filename, rows) {
+      const csvContent = rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(',')).join('\n');
+      const blob = new Blob([csvContent], {
+        type: 'text/csv;charset=utf-8;'
+      });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.setAttribute('download', filename);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    // escape HTML
+    function escapeHtml(s) {
+      if (typeof s !== 'string') return s;
+      return s.replace(/[&<>"']/g, c => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+      }[c]));
+    }
+
+    // ---------- cargar y montar (AJUSTADA) ----------
+    async function cargarPedidos() {
+      try {
+        q('#estado').textContent = '⏳ Conectando y analizando...';
+
+        // 1. Determinar el rango a usar (desde el estado global RANGO_ACTUAL)
+        const filterOptions = RANGO_ACTUAL;
+
+        // 2. Cargar los datos filtrados
+        const filtrados = await loadRealData(filterOptions);
+
+        // 3. Determinar el texto del rango para la etiqueta
+        let rangoText;
+        if (filterOptions.start && filterOptions.end) {
+          // Formatear las fechas para la etiqueta
+          const startStr = filterOptions.start.toLocaleDateString('es-CO', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          const endStr = filterOptions.end.toLocaleDateString('es-CO', { year: 'numeric', month: '2-digit', day: '2-digit' });
+          rangoText = `${startStr} - ${endStr}`;
+        } else {
+          rangoText = q('#rangoRapido').options[q('#rangoRapido').selectedIndex].text;
+        }
+        q('#rangoLabel').textContent = rangoText;
+
+
+        if (filtrados.length === 0) {
+          q('#estado').textContent = '⚠️ No hay pedidos en este rango.';
+          q('#estado').style.color = 'var(--warning)';
+          destroyCharts();
+          // Limpiar KPIs
+          q('#k_totalPedidos').textContent = '0';
+          q('#k_totalVentas').textContent = fmtCOP(0);
+          q('#k_promedio').textContent = fmtCOP(0);
+          q('#k_clientesUnicos').textContent = '0';
+          q('#k_costoDomicilio').textContent = fmtCOP(0);
+          q('#t_pedidosDia').textContent = '0';
+          q('#t_ticketProm').textContent = fmtCOP(0);
+          q('#t_varVentas').innerHTML = '—';
+          q('#t_horaPico').textContent = '—';
+          return;
+        }
+
+        statsGlobal = analyze(filtrados); // Almacena las stats en global
+
+        destroyCharts();
+
+        // Llama a todas las funciones de renderizado
+        renderResumen(statsGlobal);
+        renderClientesTables(statsGlobal);
+        renderProductosTables(statsGlobal);
+        renderTendencias(statsGlobal);
+        generarInforme(statsGlobal);
+
+        q('#ultimaAct').textContent = (new Date()).toLocaleString();
+        q('#estado').textContent = `✅ Datos de ${statsGlobal.resumen.totalPedidos} pedidos listos`;
+        q('#estado').style.color = 'var(--success)';
+
+      } catch (e) {
+        console.error("Error al cargar pedidos:", e);
+        q('#estado').textContent = `❌ ERROR: ${e.message}`;
+        q('#estado').style.color = 'var(--danger)';
+      }
+    }
+
+    // === NUEVOS EVENT LISTENERS para el control de rango ===
+
+    // 1. Selector de Rango Rápido
+    q('#rangoRapido').addEventListener('change', (e) => {
+      const isPersonalizado = e.target.value === 'personalizado';
+
+      // Toggle para mostrar/ocultar los campos de fecha
+      q('#rangoPersonalizado').style.display = isPersonalizado ? 'flex' : 'none';
+
+      if (!isPersonalizado) {
+        // Si no es personalizado, actualiza el rango global con el número de días y recarga
+        RANGO_ACTUAL = { days: e.target.value };
+        cargarPedidos();
+      }
+    });
+
+// =================================================================
+// CÓDIGO CORREGIDO PARA btnAplicarRango (SOLUCIONA EL DESFASE DE UN DÍA)
+// =================================================================
+q('#btnAplicarRango').addEventListener('click', () => {
+    const fechaInicioStr = q('#fechaInicio').value; // Formato YYYY-MM-DD
+    const fechaFinStr = q('#fechaFin').value;       // Formato YYYY-MM-DD
+    
+    if (!fechaInicioStr || !fechaFinStr) {
+        alert('Por favor, seleccione una fecha de inicio y una fecha de fin.');
+        return;
+    }
+
+    // 1. CREAR FECHA DE INICIO LOCAL (Medianoche del día seleccionado)
+    // Se parsean los componentes para forzar la Hora Local.
+    const [y_start, m_start, d_start] = fechaInicioStr.split('-').map(Number);
+    // ✅ CLAVE: new Date(AÑO, MES-1, DÍA) fuerza la hora local 00:00:00
+    const start = new Date(y_start, m_start - 1, d_start); 
+    
+    // 2. CREAR FECHA DE FIN LOCAL
+    const [y_end, m_end, d_end] = fechaFinStr.split('-').map(Number);
+    const end = new Date(y_end, m_end - 1, d_end); 
+    
+    // 3. AJUSTE CRÍTICO: Mueve la fecha de fin al final del día (23:59:59.999 Local)
+    end.setHours(23, 59, 59, 999); 
+
+    if (start.getTime() > end.getTime()) {
+        alert('La fecha de inicio no puede ser posterior a la fecha de fin.');
+        return;
+    }
+    
+    // Actualiza el estado global a rango personalizado y recarga
+    RANGO_ACTUAL = { start: start, end: end };
+    cargarPedidos();
+});
+
+
+    // botones de acción
+    q('#btnRecargar').addEventListener('click', () => cargarPedidos());
+
+    q('#exportClientes').addEventListener('click', () => {
+      if (!statsGlobal) return alert('Carga los datos primero.');
+      const rows = [
+        ['Cliente', 'Teléfono', 'Pedidos', 'Gasto Total']
+      ];
+      statsGlobal.clientesArr.forEach(c => rows.push([c.cliente, c.telefono, c.pedidos, c.gasto]));
+      exportTableToCSV('clientes_frecuencia_gasto.csv', rows);
+    });
+
+    q('#exportProductos').addEventListener('click', () => {
+      if (!statsGlobal) return alert('Carga los datos primero.');
+      const rows = [
+        ['Producto', 'Cantidad Vendida', 'Ingreso Estimado']
+      ];
+      statsGlobal.productosArr.forEach(p => rows.push([p.nombre, p.cantidad, p.ingreso]));
+      exportTableToCSV('productos_top.csv', rows);
+    });
+
+    q('#btnExport').addEventListener('click', () => {
+      if (!statsGlobal) return alert('Carga los datos primero.');
+      const r = statsGlobal.resumen;
+      const rows = [
+        ['Métrica', 'Valor'],
+        ['Total Pedidos', r.totalPedidos],
+        ['Total Ventas', r.totalVentas],
+        ['Promedio por Pedido', r.totalPedidos ? r.totalVentas / r.totalPedidos : 0],
+        ['Clientes Únicos', Object.keys(r.clientes).length],
+        ['Costo Domicilios', r.costoDomicilioSum],
+      ];
+      exportTableToCSV('estadisticas_resumen_export.csv', rows);
+    });
+
+    q('#btnCopiar').addEventListener('click', () => {
+      const text = q('#informeText').textContent;
+      navigator.clipboard?.writeText(text).then(() => alert('Informe copiado al portapapeles'));
+    });
+
+    // 3. INICIALIZACIÓN: CARGA CONFIGURACIÓN Y LUEGO LLAMA A cargarPedidos()
+    (function init() {
+      q('#estado').textContent = '⏳ Cargando configuración desde config.json...';
+      fetch("../config.json")
+        .then(r => {
+          if (!r.ok) {
+            throw new Error(`Error de red: ${r.statusText} (${r.status})`);
+          }
+          return r.json();
+        })
+        .then(cfg => {
+          API_URL = cfg.apiUrls.reciboBaseDatos || cfg.apiUrls.envioBaseDatos;
+          if (!API_URL) {
+            throw new Error("La URL de la API no se encontró en config.json.");
+          }
+          cargarPedidos(); // ✅ llama a la función principal
+        })
+        .catch(err => {
+          console.error("❌ Error cargando config.json:", err);
+          q('#estado').textContent = '❌ ERROR: No se pudo cargar la configuración de la API.';
+          q('#estado').style.color = 'var(--danger)';
+        });
+
+
+/* ================================= MOBILE MENU TOGGLE (copiado de cierre_caja.html) ================================= */
+document.getElementById('mobile-menu-btn')?.addEventListener('click', (e) => {
+  // const el = e.currentTarget; // 'el' ya no es necesario
+  document.getElementById('sidebar').classList.toggle('active');
+});
+
+      // mejorar UX: cerrar sidebar al redimensionar a desktop (copiado de cierre_caja.html)
+      window.addEventListener('resize', () => {
+        if (window.innerWidth > 899) document.getElementById('sidebar')?.classList.remove('active');
+      });
+    })();
+
+    document.querySelectorAll('#sidebar a').forEach(link => {
+    link.addEventListener('click', () => {
+        const sidebar = document.getElementById('sidebar');
+        // const menuBtn = document.getElementById('mobile-menu-btn'); // Ya no es necesario
+        
+        // 1. Ocultar la barra lateral
+        sidebar?.classList.remove('active');
+        
+    });
+});
+  </script>
+</body>
+
+</html>

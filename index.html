@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title></title>
+  <link rel="icon" type="image/png" href="">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <!-- HEADER + CATEGORÍAS combinados -->
+ <header class="header-wrapper">
+    <div class="header">
+      <div class="header-left">
+        <a href="index.html">
+          <img src="" alt="Logo del restaurante" class="header-logo">
+        </a>
+        <div class="header-info">
+          <h1></h1>
+          <div id="status-header"></div>
+          <div id="status-subtext"></div>
+        </div>
+      </div>
+    </div>
+
+
+  <!-- 🔥 Botones generados dinámicamente -->
+<div class="filter-controls">
+    <select id="category-select" aria-label="Seleccionar Categoría"></select>
+    <input type="text" id="product-search" placeholder="Buscar producto por nombre..." aria-label="Buscar producto">
+  </div>
+  </header>
+
+
+
+
+
+  <!-- 🦴 Skeletal Loading -->
+  <div class="skeleton-container" id="skeleton-loading" style="display: none;">
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+
+    <div class="skeleton-card">
+      <div class="skeleton-image"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line skeleton-title"></div>
+        <div class="skeleton-line skeleton-price"></div>
+        <div class="skeleton-line skeleton-description"></div>
+        <div class="skeleton-line skeleton-description"></div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Error Message -->
+  <div class="error-message" id="error-message" style="display: none;">
+    Error al cargar los productos. Por favor, actualiza la página.
+  </div>
+  <!-- Menu Sections -->
+<main class="menu-sections"> 
+    <section id="main-products-grid" class="product-grid-container">
+        </section>
+
+    </main>
+
+
+
+  <!-- Product Modal -->
+  <div class="product-modal" id="product-modal">
+    <div class="product-modal-content">
+
+      <!-- Imagen principal con precio superpuesto -->
+      <div class="modal-image-container">
+        <button class="close-product-modal" onclick="closeProductModal()">×</button>
+        <div class="product-modal-image" id="modal-image-content">
+          🍽️
+        </div>
+      </div>
+
+      <div class="product-modal-header">
+        <!-- Parte izquierda: nombre + precio -->
+        <div class="product-info">
+          <h3 class="product-modal-title" id="modal-product-name">Producto</h3>
+          <div class="modal-price-overlay" id="modal-product-price">$0</div>
+        </div>
+
+        <!-- Parte derecha: incrementadores -->
+        <div class="quantity-section">
+          <div class="quantity-control">
+            <button class="quantity-btn-modal" onclick="decreaseQuantity()" id="decrease-btn">-</button>
+<input
+  type="number"
+  class="quantity-display"
+  id="modal-quantity"
+  min="1"
+  value="1"
+  oninput="handleManualQuantityInput(event)"
+>
+            <button class="quantity-btn-modal" onclick="increaseQuantity()">+</button>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- Descripción -->
+      <div class="product-modal-description" id="modal-product-description">
+        Descripción del producto
+      </div>
+
+      <!-- Instrucciones especiales -->
+      <div class="instructions-section">
+        <label class="instructions-label" for="product-instructions">
+          Instrucciones especiales (opcional):
+        </label>
+        <textarea id="product-instructions" class="instructions-textarea"
+          placeholder="Ej: Sin cebolla, sin maiz, término medio..."></textarea>
+      </div>
+
+      <!-- Incrementadores y botón fijo abajo -->
+      <div class="modal-actions">
+        <!-- Precio dinámico -->
+        <span class="add-to-cart-price" id="modal-add-price">
+          <span class="price-number">0</span>
+        </span>
+
+        <!-- Botón -->
+        <button class="add-to-cart-modal-btn" onclick="addToCartFromModal()" id="add-to-cart-modal">
+          Agregar
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Cart Modal -->
+  <div class="cart-modal" id="cart-modal">
+    <div class="cart-content">
+      <div class="cart-header">
+        <h3 class="cart-title">Tu Pedido</h3>
+        <button class="close-cart" onclick="closeCart()">×</button>
+      </div>
+
+      <div class="cart-items" id="cart-items">
+        <!-- Cart items will be inserted here -->
+      </div>
+
+      <!-- 📝 Observaciones generales -->
+      <div class="cart-observations">
+        <label for="cart-notes" class="cart-observations-label">Observaciones generales:</label>
+        <textarea id="cart-notes" class="cart-observations-textarea"
+          placeholder="Ej: Sin verduras, entregar en portería, cambio para billete..."></textarea>
+      </div>
+
+      <div class="cart-summary">
+        <p id="textmetodo">Método de pago*</p>
+        <div class="payment-method">
+          <select id="payment-method" class="cart-payment-select" required>
+            <option value="" selected disabled>💰 Selecciona método de pago</option>
+            <option value="Efectivo">💵 Efectivo</option>
+            <option value="Transferencia">💳 Transferencia</option>
+            <option value="Efectivo/Transferencia">💰 Efectivo / Transferencia</option>
+          </select>
+
+          <div class="cart-total-amount" id="cart-total-modal">Total: $0</div>
+        </div>
+        <div class="cart-actions">
+          <button class="cart-btn clear-cart" onclick="clearCart()">Vaciar</button>
+          <button class="cart-btn checkout-btn" onclick="checkout()">Pedir</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Floating Cart -->
+  <div class="cart-float" id="cart-float" onclick="openCart()">
+    <div class="cart-icon">
+      <img src="iconos/carrito.png" alt="Carrito">
+    </div>
+    <div class="cart-info" id="cart-info">
+      <div class="cart-count" id="cart-count">0 productos</div>
+      <div class="cart-total" id="cart-total">$0</div>
+    </div>
+  </div>
+
+
+
+
+
+  <!-- Modal de tipo de entrega -->
+  <div class="delivery-modal" id="delivery-modal">
+    <div class="delivery-content">
+      <h3>¿Cómo quieres recibir tu pedido?</h3>
+
+      <div class="delivery-options">
+        <button onclick="selectDeliveryType('Domicilio')" class="delivery-option-btn">
+          <span>Domicilio</span>
+        </button>
+
+        <button onclick="selectDeliveryType('Recoger en tienda')" class="delivery-option-btn">
+          <span>Recoger en tienda</span>
+        </button>
+
+        <button onclick="selectDeliveryType('Mesa')" class="delivery-option-btn">
+          <span>Mesa</span>
+        </button>
+      </div>
+
+      <button class="close-delivery" onclick="closeDeliveryModal()">Cancelar</button>
+    </div>
+  </div>
+
+
+
+
+  <!-- Modal de datos del cliente -->
+  <div class="customer-modal" id="customer-modal">
+    <div class="customer-content">
+      <h3 id="customer-modal-title">Datos del pedido</h3>
+      <p class="customer-subtitle">
+        Estás a un paso de confirmar tu pedido<br>
+        Solo ingresa estos datos y ¡listo!
+      </p>
+
+      <form id="customer-form">
+        <input type="text" id="customer-name" placeholder="👤 Nombre completo" required>
+        <input type="tel" id="customer-phone" placeholder="📞 Número de teléfono" required>
+        <div id="mesa-field" style="display:none;">
+          <input type="text" id="customer-mesa" placeholder="🍽️ Número de mesa" required>
+        </div>
+
+        <!-- ⚠️ Nuevo texto de aviso -->
+        <p style="
+        text-align:center;
+        color:#868686;
+        font-size:14px;
+        margin:12px 0 8px;
+        ">
+          Por favor verifica tus datos antes de enviar
+        </p>
+
+        <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
+      </form>
+
+      <button class="close-customer" onclick="closeCustomerModal()">Cancelar</button>
+    </div>
+  </div>
+
+
+
+  <!-- === FOOTER INFO === -->
+  <footer class="footer-info">
+    <div class="footer-socials">
+      <a href="#" target="_blank" class="social-link">
+        <img src="iconos/redes/whatsapp.png" alt="WhatsApp">
+      </a>
+     <a href="#" target="_blank" class="social-link">
+        <img src="iconos/redes/instagram.png" alt="Instagram">
+      </a>
+      <a href="#" target="_blank" class="social-link">
+        <img src="iconos/redes/facebook.png" alt="Facebook">
+      </a>
+    </div>
+
+    <div class="footer-qr">
+      <img src="" alt="QR Mr. George">
+    </div>
+
+  <div class="footer-branches">
+    <p></p>
+  </div>
+
+
+    <div class="footer-policies">
+      <a href="terms.html" target="_blank">Términos y condiciones</a>
+      <a href="privacity.html" target="_blank">Políticas de privacidad</a>
+    </div>
+
+  <div class="footer-content">
+    <div>
+      <img src="" alt="Logo del restaurante" class="footer-logo">
+    </div>
+
+<div class="create-store">
+  <a href="#" target="_blank" class="create-store-btn">
+    Crea tu tienda aquí
+  </a>
+</div>
+
+  </footer>
+
+
+
+  <script src="config-loader.js"></script>
+  <script src="horario.js"></script>
+  <script src="productos-variable.js"></script>
+  <script src="domicilio.js"></script>
+  <script src="enviar-whatsapp.js"></script>
+  <script src="script.js"></script>
+  <script src="enviar-sheets.js"></script>
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mi Galería de Imágenes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            box-sizing: border-box;
+        }
+        
+        .image-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .image-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .modal {
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-image {
+            max-width: 90vw;
+            max-height: 90vh;
+            object-fit: contain;
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-blue-50 to-indigo-100 min-h-full">
+    <!-- Header -->
+    <header class="bg-white shadow-sm">
+        <div class="max-w-6xl mx-auto px-4 py-6 text-center">
+            <h1 class="text-3xl font-bold text-gray-900">Mi Galería Personal</h1>
+            <p class="text-gray-600 mt-2">Colección de mis mejores fotografías</p>
+        </div>
+    </header>
+
+    <!-- Buscador -->
+    <section class="max-w-6xl mx-auto px-4 mt-6">
+        <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Buscar imágenes..." 
+            class="w-full p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            oninput="filterGallery()"
+        >
+    </section>
+
+    <!-- Galería -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6" id="gallery">
+            <!-- La galería se genera dinámicamente -->
+        </div>
+    </main>
+
+    <!-- Modal -->
+    <div id="imageModal" class="fixed inset-0 bg-black bg-opacity-75 modal z-50 hidden items-center justify-center p-4" onclick="closeModal()">
+        <div class="relative">
+            <button onclick="closeModal()" class="absolute -top-10 right-0 text-white hover:text-gray-300 text-3xl font-bold z-10">×</button>
+            <img id="modalImage" src="" alt="" class="modal-image rounded-lg">
+            <div class="text-center mt-4">
+                <h3 id="modalTitle" class="text-white text-xl font-semibold"></h3>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-white mt-16">
+        <div class="max-w-6xl mx-auto px-4 py-6 text-center">
+            <p class="text-gray-600">© 2024 Mi Galería Personal. Todas las imágenes son de mi autoría.</p>
+        </div>
+    </footer>
+
+    <script>
+        function openModal(imageSrc, imageTitle) {
+            const modal = document.getElementById('imageModal');
+            document.getElementById('modalImage').src = imageSrc;
+            document.getElementById('modalTitle').textContent = imageTitle;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('imageModal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            document.body.style.overflow = 'auto';
+        }
+
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        document.getElementById('modalImage').addEventListener('click', e => e.stopPropagation());
+
+        const imageFiles = [
+"imagenes/Almuerzocompleto.jpg",
+"imagenes/Almuerzosimple.jpg",
+"imagenes/armatualmuerzo.jpg",
+"imagenes/armatupizza.jpg",
+"imagenes/atrevida.jpg",
+"imagenes/atrevidapersonal.jpg",
+"imagenes/Choripapazo.jpg",
+"imagenes/cocacola400.jpg",
+"imagenes/colombiana400.jpg",
+"imagenes/combofantasticweb.jpg",
+"imagenes/coronamichelada.jpg",
+"imagenes/default.jpg",
+"imagenes/express.jpg",
+"imagenes/golosa.jpg",
+"imagenes/golosapersonal.jpg",
+"imagenes/IMG_1961.jpg",
+"imagenes/IMG_1983.jpg",
+"imagenes/kolaroman400.jpg",
+"imagenes/LaBestia.jpg",
+"imagenes/LaCosteña.jpg",
+"imagenes/LaMentirosa.jpg",
+"imagenes/LaSalchichera.jpg",
+"imagenes/limon.jpg",
+"imagenes/lulo.jpg",
+"imagenes/mama.jpg",
+"imagenes/manzana400.jpg",
+"imagenes/maracuya.jpg",
+"imagenes/michelada.jpg",
+"imagenes/mister.jpg",
+"imagenes/mora.jpg",
+"imagenes/mora500.jpg",
+"imagenes/naranjapiña500.jpg",
+"imagenes/Paisa.jpg",
+"imagenes/papasfrancesas.jpg",
+"imagenes/picada.jpg",
+"imagenes/pizzamargarita.jpg",
+"imagenes/pizzapepperoni.jpg",
+"imagenes/quesomozzarella.jpg",
+"imagenes/rancher.jpg",
+"imagenes/Ranchero.jpg",
+"imagenes/royal.jpg",
+"imagenes/sodafresa.jpg",
+"imagenes/sodamaracuya.jpg",
+"imagenes/sodasandia.jpg",
+"imagenes/Sopas.jpg",
+"imagenes/tropical500.jpg",
+"imagenes/uva400.jpg",
+        ];
+
+        function titleFromFilename(filename) {
+            const name = filename.split('/').pop().replace(/\.[^/.]+$/, "");
+            return name.replace(/[_-]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        }
+
+        function generateGallery(images) {
+            const gallery = document.getElementById('gallery');
+            gallery.innerHTML = '';
+            images.forEach(src => {
+                const title = titleFromFilename(src);
+                const container = document.createElement('div');
+                container.className = 'image-item bg-white rounded-lg overflow-hidden shadow-md cursor-pointer';
+                container.onclick = () => openModal(src, title);
+                container.innerHTML = `
+                    <img src="${src}" alt="${title}" class="w-full h-64 object-cover">
+                    <div class="p-3">
+                        <h3 class="font-semibold text-gray-800">${title}</h3>
+                    </div>`;
+                gallery.appendChild(container);
+            });
+        }
+
+        function filterGallery() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = imageFiles.filter(img => titleFromFilename(img).toLowerCase().includes(query));
+            generateGallery(filtered);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => generateGallery(imageFiles));
+    </script>
+</body>
+</html>

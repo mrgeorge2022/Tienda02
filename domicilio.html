@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cargando...</title>
+  <link rel="icon" type="image/png" href="">
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Leaflet -->
+
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+
+<body>
+  <!-- 🗺️ Mapa -->
+  <div id="map"></div>
+
+  <!-- 🌫️ Controles flotantes -->
+  <div class="overlay">
+    <!-- 🔙 Botón de ir atrás dentro del overlay -->
+    <button class="btn-back" onclick="window.location.href='index.html'"">
+      <img src=" iconos/back.png" alt="Atrás" />
+    </button>
+
+    <div class="input-container">
+      <input type="text" id="buscar" placeholder="🔍 Buscar dirección o barrio..." />
+      <span class="clear-btn" id="clearBuscar">✖</span>
+    </div>
+
+    <div id="suggestions" class="suggestions"></div>
+
+    <div class="input-container">
+      <input type="text" id="referencia" placeholder="📍 Punto de referencia (opcional)" />
+      <span class="clear-btn" id="clearReferencia">✖</span>
+    </div>
+  </div>
+
+  <!-- Panel de totales -->
+  <div class="panel" id="panel-totales">
+    <button id="btn-ubicacion" class="locate-btn" title="Usar ubicación actual">
+      <img src="iconos/norte.png" alt="Ubicación" />
+    </button>
+
+    <div class="linea">
+      <span id="subtotal-label">Subtotal productos:</span>
+      <span id="subtotal">$0</span>
+    </div>
+    <div class="linea">
+      <span id="domicilio-label">Costo domicilio:</span>
+      <span id="domicilio-cost">Pendiente</span>
+    </div>
+    <div class="linea" id="recargo-nocturno" style="color: #d84315; font-size: 14px; display: none;">
+      ⚠️ A partir de las 10:00 PM el domicilio aumenta un 20% por recargo nocturno
+    </div>
+
+    <div class="linea total">
+      <span>Total a pagar:</span>
+      <span id="total">$0</span>
+    </div>
+    <button class="btn-finalizar" onclick="finalizarPedido()">Finalizar pedido</button>
+  </div>
+
+
+
+  <!-- 🧾 Modal de datos del cliente -->
+  <div class="customer-modal" id="customer-modal">
+    <div class="customer-content">
+      <h3 id="customer-modal-title">Domicilio</h3>
+      <p class="customer-subtitle">
+        Estás a un paso de confirmar tu pedido<br>
+        Solo ingresa estos datos y ¡listo!
+      </p>
+      <form id="customer-form">
+        <input type="text" id="customer-name" placeholder="👤 Nombre completo" required>
+        <input type="tel" id="customer-phone" placeholder="📞 Número de teléfono" required>
+        <div id="mesa-field" style="display:none;">
+          <input type="text" id="customer-mesa" placeholder="🍽️ Número de mesa">
+        </div>
+
+        <!-- ⚠️ Nuevo texto de aviso -->
+      <p style="
+        text-align:center;
+        color:#868686;
+        font-size:14px;
+        margin:12px 0 8px;
+        ">
+        Por favor verifica tus datos antes de enviar
+      </p>
+
+        <button type="submit" class="submit-customer-btn">Confirmar pedido</button>
+      </form>
+
+      <button class="close-customer" onclick="closeCustomerModal()">Cancelar</button>
+    </div>
+  </div>
+
+
+
+
+
+
+
+
+  <!-- Scripts -->
+  <script>
+    document.getElementById("clearBuscar").addEventListener("click", () => {
+      document.getElementById("buscar").value = "";
+      document.getElementById("buscar").focus();
+    });
+
+    document.getElementById("clearReferencia").addEventListener("click", () => {
+      document.getElementById("referencia").value = "";
+      document.getElementById("referencia").focus();
+    });
+  </script>
+
+
+
+  <script src="config-loader.js"></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.min.js"></script>
+
+  <script src="enviar-whatsapp.js"></script>
+  <script src="domicilio.js"></script>
+  <script src="enviar-sheets.js"></script>
+
+</body>
+
+</html>

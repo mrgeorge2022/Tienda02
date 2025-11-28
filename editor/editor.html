@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editor de Configuración | Tienda</title>
+  <link rel="icon" href="">
+<style>
+/* ============================================================================
+   🎨 ESTILOS OPTIMIZADOS - EDITOR DE CONFIGURACIÓN TIENDA
+   ============================================================================ */
+
+/* --------------------------
+   🌐 VARIABLES GLOBALES
+--------------------------- */
+:root {
+  --bg-main: #f5f6fa;
+  --bg-card: #ffffff;
+  --border: #ddd;
+  --primary: #000000;
+  --primary-light: #e8f1ff;
+  --danger: #ff4d4d;
+  --text: #333;
+  --muted: #666;
+  --radius: 10px;
+  --transition: 0.25s ease;
+}
+
+/* --------------------------
+   🧱 ESTRUCTURA GENERAL
+--------------------------- */
+body {
+  font-family: "Inter", system-ui, sans-serif;
+  background: var(--bg-main);
+  color: var(--text);
+  margin: 0;
+  padding: 2rem;
+}
+
+h1, h2 {
+  font-weight: 600;
+  color: var(--primary);
+  text-align: center;
+}
+
+#editor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 950px;
+  margin: 0 auto;
+}
+
+/* --------------------------
+   🧩 SECCIONES PRINCIPALES
+--------------------------- */
+.section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  padding: 20px;
+  transition: box-shadow var(--transition);
+}
+
+.section:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+.section h2 {
+  font-size: 1.3rem;
+  border-bottom: 2px solid var(--primary);
+  padding-bottom: 0.3rem;
+  margin-bottom: 1.2rem;
+}
+
+/* --------------------------
+   🔹 CAMPOS GENERALES
+--------------------------- */
+.campo {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1rem;
+}
+
+.input {
+  padding: 0.5rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: #fff;
+  transition: border var(--transition), box-shadow var(--transition);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-light);
+}
+
+.descripcion {
+  font-size: 0.8rem;
+  color: var(--muted);
+  margin-top: 0.2rem;
+}
+
+/* === 🎨 COLORES OPTIMIZADOS === */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.color-card {
+  display: flex;
+  flex-direction: column;
+  background: #fafafa;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px;
+  transition: transform var(--transition), box-shadow var(--transition);
+}
+
+.color-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+
+.color-pair{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
+  width: 100%;
+}
+
+.color-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.color-info label {
+  font-weight: 600;
+}
+
+.color-inputs {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.color-inputs input[type="color"] {
+  width: 40px;
+  height: 35px;
+  border: none;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.color-inputs input[type="text"],
+.color-info textarea {
+  flex: 1;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.4rem;
+  font-size: 0.9rem;
+  background: #fff;
+}
+
+.color-preview {
+  width: 45px;
+  height: 35px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  box-shadow: inset 0 0 3px rgba(0,0,0,0.1);
+}
+
+/* --------------------------
+   🍽️ CATEGORÍAS
+--------------------------- */
+.category-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) auto;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  align-items: center;
+  background: var(--card-bg);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.category-row input {
+  padding: 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--muted);
+  background: var(--bg-end);
+  color: var(--text);
+  font-size: 0.9rem;
+}
+
+.category-row button {
+  background: var(--primary);
+  border: none;
+  color: #fff;
+  padding: 0.5rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background var(--transition);
+}
+
+.category-row button:hover {
+  background: #005ed1;
+}
+
+#btn-agregar-categoria {
+  background: var(--primary);
+  color: #fff;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  margin-top: 0.5rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background var(--transition), transform var(--transition);
+}
+
+#btn-agregar-categoria:hover {
+  background: #005ed1;
+  transform: translateY(-2px);
+}
+
+/* --------------------------
+   🌐 REDES / APIs / SEDE
+--------------------------- */
+#contenedor-redes,
+#contenedor-apis,
+#contenedor-sede {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* --------------------------
+   🟩 BOTÓN PRINCIPAL DE ACCIÓN
+--------------------------- */
+#btn-action {
+  display: block;
+  margin: 2rem auto 0;
+  background: var(--primary);
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all var(--transition);
+  width: fit-content;
+}
+
+#btn-action.cambios {
+  background: #1aa53a;
+}
+
+#btn-action:hover {
+  transform: scale(1.04);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.action-bar {
+  position: sticky;
+  bottom: 40px;
+}
+
+  </style>
+</head>
+
+<body>
+  <h1>🧩 Editor de Configuración - Tienda</h1>
+  <div id="editor-container"></div>
+
+
+
+  <div class="action-bar">
+    <button class="btn-action" id="btn-action">✅ Aceptar configuración</button>
+  </div>
+
+  <script src="editor.js"></script>
+</body>
+</html>

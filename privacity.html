@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cargando...</title>
+    <link rel="icon" type="image/png" href="icono_tienda_inicio.png">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #000000;
+            padding: 20px;
+            background-color: #fff;
+        }
+
+        h1,
+        h2 {
+            color: #000000;
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            margin-top: 20px;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Política de Privacidad</h1>
+
+    <p>En <strong>mi tienda</strong>, valoramos tu privacidad y nos comprometemos a proteger tus datos personales. Esta
+        política de privacidad describe cómo recopilamos, usamos, protegemos y manejamos tu información.</p>
+
+    <h2>1. Recopilación de Datos</h2>
+
+    <p><strong>Datos Personales:</strong> Solo recopilamos datos personales que tú decides proporcionarnos de forma
+        voluntaria, como nombre, correo electrónico, dirección y número de teléfono, cuando realizas una compra o te
+        pones en contacto con nosotros.</p>
+
+    <p><strong>Datos de Navegación:</strong> Utilizamos cookies y tecnologías similares para mejorar tu experiencia en
+        nuestra página. Estas tecnologías no recopilan información personal sensible y puedes configurarlas desde tu
+        navegador.</p>
+
+    <h2>2. Uso de la Información</h2>
+
+    <p><strong>Finalidad:</strong> Los datos que recopilamos se utilizan exclusivamente para:</p>
+    <ul>
+        <li>Procesar pedidos y entregas.</li>
+        <li>Brindar soporte al cliente.</li>
+        <li>Mejorar nuestra página web y servicios.</li>
+        <li>Enviar comunicaciones relacionadas con tus compras o promociones, si has dado tu consentimiento.</li>
+    </ul>
+
+    <p><strong>No Compartimos Datos:</strong> No vendemos, compartimos ni intercambiamos tus datos personales con
+        terceros, salvo que sea requerido por ley o necesario para prestar los servicios que solicitas.</p>
+
+    <h2>3. Protección de Datos</h2>
+
+    <p><strong>Medidas de Seguridad:</strong> Implementamos medidas técnicas y organizativas para proteger tu
+        información contra accesos no autorizados, pérdida o alteración.</p>
+
+    <p><strong>Responsabilidad del Usuario:</strong> Recomendamos mantener actualizado el software de tu dispositivo y
+        tomar precauciones para proteger tu información personal.</p>
+
+    <h2>4. Derechos del Usuario</h2>
+
+    <p><strong>Acceso y Rectificación:</strong> Tienes derecho a acceder, corregir o eliminar tus datos personales en
+        cualquier momento. Para ejercer estos derechos, contáctanos a través de nuestro formulario de contacto.</p>
+
+    <p><strong>Retiro del Consentimiento:</strong> Puedes retirar tu consentimiento para el uso de tus datos en cualquier
+        momento, lo que podría limitar ciertos servicios.</p>
+
+    <h2>5. Cambios en la Política</h2>
+
+    <p><strong>Actualizaciones:</strong> Nos reservamos el derecho de modificar esta política de privacidad en cualquier
+        momento. Publicaremos los cambios en esta página y, cuando sea posible, te notificaremos a través de otros
+        medios.</p>
+
+    <p>Gracias por confiar en <strong>mi tienda</strong>. Nos esforzamos por proteger tu privacidad y brindarte una
+        experiencia segura.</p>
+
+</body>
+<script src="config-loader.js"></script>
+
+<script>
+document.addEventListener("configCargado", (event) => {
+  const config = event.detail;
+  const nombreTienda = config.nombreRestaurante || "Mi Tienda";
+
+  // Cambiar el título de la pestaña
+  document.title = `Política de Privacidad | ${nombreTienda}`;
+
+  // Reemplazar "mi tienda" por el nombre real dentro del contenido
+  document.body.innerHTML = document.body.innerHTML.replace(/mi tienda/gi, nombreTienda);
+});
+</script>
+
+</html>
