@@ -402,10 +402,18 @@ function imprimirPedido(idElemento) {
     </html>
   `);
 
-  ventanaImpresion.document.close();
-  ventanaImpresion.print();
-  ventanaImpresion.close();
+
+ventanaImpresion.document.close();
+  
+  // 🟢 SOLUCIÓN MÓVIL: Usa setTimeout para un breve retraso
+  // y elimina el cierre inmediato, permitiendo que el diálogo de impresión se muestre
+  setTimeout(() => {
+    ventanaImpresion.print();
+  }, 300); // Espera 300ms. Suficiente para cargar la impresión.
+  
+  // ventanaImpresion.close(); // ❌ COMENTAR O ELIMINAR ESTA LÍNEA
 }
+
 
 
 // ================================
@@ -440,4 +448,5 @@ document.getElementById("btn-recargar").addEventListener("click", () => {
 
 
 // ✅ Iniciar todo
+
 init();
