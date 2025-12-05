@@ -39,9 +39,10 @@
 
   <!-- Panel de totales -->
   <div class="panel" id="panel-totales">
-    <button id="btn-ubicacion" class="locate-btn" title="Usar ubicación actual">
-      <img src="iconos/norte.png" alt="Ubicación" />
-    </button>
+<button id="btn-ubicacion" class="locate-btn" title="Usar ubicación actual">
+  <span id="location-alert" class="location-alert-text">Selecciona tu ubicación aquí</span>
+    <img src="iconos/norte.png" alt="Ubicación" />
+</button>
 
     <div class="linea">
       <span id="subtotal-label">Subtotal productos:</span>
@@ -121,6 +122,8 @@
   <script src="config-loader.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.min.js"></script>
+  
+
 
   <script src="enviar-whatsapp.js"></script>
   <script src="domicilio.js"></script>

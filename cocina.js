@@ -2,35 +2,45 @@ let API_URL = ""; // ← se cargará dinámicamente desde config.json
 let pedidosGlobal = [];
 let ultimaVersion = "";
 
+
+
+
 // ================================
-// 🔹 1. CARGAR CONFIG Y EMPEZAR
+// 🔹 1. CARGAR CONFIG Y EMPEZAR (Modificada)
 // ================================
 async function init() {
-  try {
-    const res = await fetch("config.json", { cache: "no-store" });
-    if (!res.ok) throw new Error("No se pudo cargar config.json");
+    try {
+        const res = await fetch("config.json", { cache: "no-store" });
+        if (!res.ok) throw new Error("No se pudo cargar config.json");
 
-    const config = await res.json();
-    API_URL = config.apiUrls.reciboBaseDatos; // fallback si no existe "cocina"
+        const config = await res.json();
+        API_URL = config.apiUrls.reciboBaseDatos; 
 
+        // ⚙️ Inicializar controles de scroll de botones
+        setupScrollControls(); 
+        
+        // 🆕 Inicializar scroll horizontal con rueda
+        setupMouseWheelScroll(); 
 
-    // ⚙️ Inicializar controles de scroll
-    setupScrollControls(); 
-
-    // Cargar pedidos iniciales
-    cargarPedidos();
-    setInterval(cargarPedidos, 2000);
-    
-  } catch (err) {
-    console.error("⚠️ Error cargando configuración:", err);
-  }
+        // Cargar pedidos iniciales
+        cargarPedidos();
+        setInterval(cargarPedidos, 2000);
+        
+    } catch (err) {
+        console.error("⚠️ Error cargando configuración:", err);
+    }
 }
 
 // ================================
 // 🔹 2. CARGAR PEDIDOS
 // ================================
+// ================================
+// 🔹 2. CARGAR PEDIDOS (Modificada para Sonido)
+// ================================
 async function cargarPedidos() {
   const contenedor = document.getElementById("lista-pedidos");
+  // 🆕 Obtener el elemento de audio
+  const alertaAudio = document.getElementById("alerta-sonido");
 
   try {
     const res = await fetch(`${API_URL}?t=${Date.now()}`, { cache: "no-store" });
@@ -40,8 +50,24 @@ async function cargarPedidos() {
     const versionActual = JSON.stringify(pedidos);
 
     // Evita redibujar si no hay cambios
-    if (versionActual === ultimaVersion) return;
-    ultimaVersion = versionActual;
+    if (versionActual === ultimaVersion) {
+        // Si no hay cambios, salimos sin hacer nada
+        return; 
+    }
+    
+    // 🔔 LÓGICA DE SONIDO: Si hay una diferencia entre versiones Y no es la primera carga (ultimaVersion != "")
+    if (ultimaVersion !== "") {
+        // Reiniciamos el audio si ya estaba en reproducción
+        alertaAudio.currentTime = 0; 
+        alertaAudio.play().catch(error => {
+            // Manejo de error por auto-reproducción bloqueada por el navegador
+            console.log("El navegador bloqueó la auto-reproducción de la alerta de sonido.", error);
+            // Podrías mostrar un mensaje pidiendo al usuario hacer un clic en la página
+        });
+    }
+
+    ultimaVersion = versionActual; // Actualizar la versión solo después de comprobar
+
 
     // Formatea fecha
     pedidosGlobal = pedidos.map(p => {
@@ -144,7 +170,9 @@ function filtrarPorFecha() {
 
     const div = document.createElement("div");
     div.className = `pedido ${claseTipo}`;
-    const idPedido = `pedido-${p.numeroFactura || Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    const idPedido = `${p.numeroFactura
+      
+    }`;
     div.id = idPedido;
 
     function extraerCantidad(producto) {
@@ -252,29 +280,104 @@ async function actualizarEstado(numeroFactura, tipo) {
 }
 
 // ================================
-// 🔹 5. LÓGICA DE SCROLL PULSANTE (Mantenido)
+// 🔹 5. LÓGICA DE SCROLL PULSANTE (Híbrida - Clic Rápido / Mantenido)
 // ================================
 function setupScrollControls() {
     const listaPedidos = document.getElementById('lista-pedidos');
     const scrollLeftBtn = document.getElementById('scroll-left');
     const scrollRightBtn = document.getElementById('scroll-right');
-    const scrollAmount = 260; 
+    
+    // --- Valores de Scroll ---
+    const SCROLL_AMOUNT_CLICK = 230;    // ⬅️ Desplazamiento para un clic rápido
+    const SCROLL_AMOUNT_CONT = 20;      // ⬅️ Desplazamiento por intervalo (continuo)
+    const SCROLL_INTERVAL = 50;         // ⬅️ Frecuencia del scroll en ms (suavidad)
+    const HOLD_DELAY = 250;             // ⬅️ Retraso en ms antes de iniciar el scroll continuo
+    
+    let scrollTimer = null; // Para el scroll continuo
+    let holdTimeout = null; // Para el temporizador de inicio del scroll continuo
 
     if (!listaPedidos || !scrollLeftBtn || !scrollRightBtn) return;
 
-    scrollLeftBtn.addEventListener('click', () => {
-        listaPedidos.scrollBy({
-            left: -scrollAmount,
-            behavior: 'smooth' 
-        });
-    });
+    /**
+     * Inicia el scroll continuo en la dirección especificada.
+     * @param {number} direction - -1 para izquierda, 1 para derecha.
+     */
+    function startContinuousScrolling(direction) {
+        if (scrollTimer) return;
+        scrollTimer = setInterval(() => {
+            listaPedidos.scrollBy({
+                left: direction * SCROLL_AMOUNT_CONT,
+                behavior: 'auto' // Debe ser 'auto' para un scroll continuo fluido
+            });
+        }, SCROLL_INTERVAL);
+    }
 
-    scrollRightBtn.addEventListener('click', () => {
-        listaPedidos.scrollBy({
-            left: scrollAmount,
-            behavior: 'smooth' 
-        });
-    });
+    /**
+     * Detiene ambos temporizadores (Timeout y Interval).
+     * @param {number} direction - -1 para izquierda, 1 para derecha.
+     */
+    function stopScrolling(direction) {
+        if (holdTimeout) {
+            clearTimeout(holdTimeout);
+            holdTimeout = null;
+            
+            // Si se suelta el clic antes de que inicie el scroll continuo (Timeout),
+            // ejecutamos el scroll único de 230px.
+            if (!scrollTimer) {
+                 listaPedidos.scrollBy({
+                    left: direction * SCROLL_AMOUNT_CLICK,
+                    behavior: 'smooth' // Se usa 'smooth' para el clic rápido
+                });
+            }
+        }
+        
+        if (scrollTimer) {
+            clearInterval(scrollTimer);
+            scrollTimer = null;
+        }
+    }
+
+    /**
+     * Manejador de la pulsación (mousedown/touchstart).
+     * @param {number} direction - -1 para izquierda, 1 para derecha.
+     */
+    function handleStart(direction) {
+        // Limpiamos por seguridad
+        stopScrolling(direction); 
+        
+        // 1. Iniciamos el temporizador de espera.
+        // Si el usuario sigue pulsando después de HOLD_DELAY, iniciamos el scroll continuo.
+        holdTimeout = setTimeout(() => {
+            holdTimeout = null; // El timeout ya se ejecutó
+            startContinuousScrolling(direction);
+        }, HOLD_DELAY);
+    }
+
+
+    // --- Configuración para el botón de SCROLL IZQUIERDA ---
+    scrollLeftBtn.addEventListener('mousedown', () => handleStart(-1));
+    scrollLeftBtn.addEventListener('mouseup', () => stopScrolling(-1));
+    scrollLeftBtn.addEventListener('mouseleave', () => stopScrolling(-1));
+    
+    // Dispositivos táctiles
+    scrollLeftBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleStart(-1);
+    }, { passive: false });
+    scrollLeftBtn.addEventListener('touchend', () => stopScrolling(-1));
+
+
+    // --- Configuración para el botón de SCROLL DERECHA ---
+    scrollRightBtn.addEventListener('mousedown', () => handleStart(1));
+    scrollRightBtn.addEventListener('mouseup', () => stopScrolling(1));
+    scrollRightBtn.addEventListener('mouseleave', () => stopScrolling(1));
+    
+    // Dispositivos táctiles
+    scrollRightBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        handleStart(1);
+    }, { passive: false });
+    scrollRightBtn.addEventListener('touchend', () => stopScrolling(1));
 }
 
 // ================================
@@ -293,7 +396,7 @@ function imprimirPedido(idElemento) {
   ventanaImpresion.document.write(`
     <html>
       <head>
-        <title>Comanda - ${idElemento}</title>
+        <title>${idElemento}</title>
         <style>
           /* ⚙️ Estilos para impresión térmica (AJUSTADOS) */
           body { 
@@ -339,7 +442,7 @@ function imprimirPedido(idElemento) {
           .pedido-hora, .pedido strong { 
             color: #000; 
             font-weight: normal; 
-            font-size: 8pt; 
+            font-size: 11pt; 
           }
           .pedido-numero, .pedido-hora { 
             display: block; 
@@ -351,16 +454,15 @@ function imprimirPedido(idElemento) {
             font-weight: normal; 
           }
           .pedido-cliente, .pedido-mesa { 
-            margin-bottom: 5px; 
             font-size: 11pt; 
-            text-align: left; 
+            text-align: center; 
           }
           .pedido-cliente strong, .pedido-mesa strong { display: inline; }
           .pedido-cliente span, .pedido-mesa span { font-weight: normal; }
           .pedido-productos { padding: 0; margin-top: 10px; border: none; }
           .cantidadproducto { 
             display: flex; 
-            align-items: flex-start; 
+            align-items: center; 
             padding: 3px 0; 
             border-bottom: 1px dashed #aaa; 
             gap: 5px; 
@@ -391,29 +493,60 @@ function imprimirPedido(idElemento) {
             border-radius: 0;
             border: 1px dashed #000; 
           }
-          .btn-imprimir, .pedido-direccion, .total-productos { display: none; }
-        </style>
+/* ⚠️ CORRECCIÓN CLAVE: Ocultar elementos SOLO en la impresión. */
+            /* Esto mantiene la visualización de los botones de control en pantalla. */
+            @media print {
+              .btn-imprimir, 
+              .pedido-direccion, 
+              .total-productos, 
+              .acciones-pedido { 
+                display: none !important; 
+              }      
+            }
+
+            /* Asegurar que se muestren los botones en la pantalla de previsualización */
+            @media screen {
+                .acciones-pedido { display: flex; justify-content: center; } 
+            }
+</style>
       </head>
-      <body>
-        <div class="comanda-wrapper">
-          ${contenidoAImprimir.outerHTML}
-        </div>
-      </body>
-    </html>
-  `);
+        <body>
+          <div class="comanda-wrapper">
+            ${contenidoAImprimir.outerHTML}
+            
+            <div class="espacio-corte" style="height: 30px;"></div> 
+
+            <div class="acciones-pedido" style="text-align: center; margin-top: 15px;">
+              <button id="btn-imprimir-final" style="padding: 10px 20px; font-size: 16px; margin: 5px; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 5px;">Imprimir</button>
+              <button id="btn-cerrar-final" style="padding: 10px 20px; font-size: 16px; margin: 5px; cursor: pointer; background-color: #f44336; color: white; border: none; border-radius: 5px;">Cerrar</button>
+            </div>
+          </div>
+        </body>
+      </html>
+    `);
 
 
 ventanaImpresion.document.close();
-  
-  // 🟢 SOLUCIÓN MÓVIL: Usa setTimeout para un breve retraso
-  // y elimina el cierre inmediato, permitiendo que el diálogo de impresión se muestre
-  setTimeout(() => {
-    ventanaImpresion.print();
-  }, 300); // Espera 300ms. Suficiente para cargar la impresión.
-  
-  // ventanaImpresion.close(); // ❌ COMENTAR O ELIMINAR ESTA LÍNEA
-}
+  
+  // 🟢 1. Los botones se vuelven funcionales INMEDIATAMENTE
+  ventanaImpresion.document.getElementById('btn-imprimir-final').addEventListener('click', () => {
+      // Re-impresión manual si la automática se cancela.
+      ventanaImpresion.print();
+  });
 
+  ventanaImpresion.document.getElementById('btn-cerrar-final').addEventListener('click', () => {
+      // Cierre manual de la ventana por el usuario.
+      ventanaImpresion.close();
+  });
+
+  // 🔄 2. Disparar la impresión automática DESPUÉS del retraso. 
+  setTimeout(() => {
+    // Cuando se llama a print(), el CSS con @media print oculta los botones.
+    ventanaImpresion.print(); 
+  }, 200); 
+  
+  // Es crucial NO llamar a ventanaImpresion.close() aquí.
+}
 
 
 // ================================
@@ -440,6 +573,28 @@ document.querySelectorAll('#tipo-filtros .filter-input').forEach(input => {
     });
 });
 
+// ================================
+// 🔹 8. SCROLL HORIZONTAL CON RUEDA
+// ================================
+function setupMouseWheelScroll() {
+    const listaPedidos = document.getElementById('lista-pedidos');
+
+    if (!listaPedidos) return;
+
+    listaPedidos.addEventListener('wheel', (e) => {
+        // e.deltaY representa el desplazamiento vertical (scroll normal de la rueda)
+        // e.preventDefault() detiene el scroll vertical por defecto en la página
+        e.preventDefault(); 
+        
+        // Traducimos el desplazamiento vertical (e.deltaY) a desplazamiento horizontal (scrollLeft)
+        // El factor de 1.5 a 2x se usa para hacer el scroll horizontal más sensible
+        listaPedidos.scrollLeft += e.deltaY * 2; 
+        
+        // Opcional: También puedes usar e.deltaX si usas un trackpad o ratón con scroll lateral
+        // listaPedidos.scrollLeft += e.deltaX;
+    });
+}
+
 // Listener del botón recargar: Guarda el estado antes de recargar la página.
 document.getElementById("btn-recargar").addEventListener("click", () => {
     saveFilterState(); // 💾 Guardar estado antes de recargar
@@ -448,5 +603,4 @@ document.getElementById("btn-recargar").addEventListener("click", () => {
 
 
 // ✅ Iniciar todo
-
 init();

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error 404</title>
+    <style>
+        /* 🎨 Estilos Generales y Reset */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0d1117; 
+            color: #c9d1d9; 
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden; 
+        }
+
+        /* 🖼️ Contenedor Principal */
+        .container {
+            text-align: center;
+            max-width: 90%;
+            animation: fadeIn 1s ease-out; 
+        }
+
+        /* 💥 Animación para el Número 404 */
+        h1 {
+            font-size: 10em;
+            color: #ff7b72; 
+            margin: 0;
+            text-shadow: 0 0 10px rgba(255, 123, 114, 0.5);
+            animation: pulse 2s infinite alternate; 
+        }
+
+        /* 💡 Título y Mensajes */
+        h2 {
+            font-size: 2.5em;
+            margin-top: 5px;
+            color: #58a6ff; 
+            letter-spacing: 2px;
+        }
+
+        p {
+            font-size: 1.2em;
+            margin: 25px 0;
+        }
+        
+        /* 🔑 Keyframes CSS (Animaciones) */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        /* Estrellas/Partículas de fondo (decoración extra) */
+        .star {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: #ffffff;
+            border-radius: 50%;
+            opacity: 0;
+            animation: twinkle 5s infinite ease-in-out;
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Posicionamiento aleatorio de las estrellas */
+        .star:nth-child(1) { top: 10%; left: 20%; animation-delay: 0s; }
+        .star:nth-child(2) { top: 50%; left: 80%; animation-delay: 1.5s; }
+        .star:nth-child(3) { top: 80%; left: 40%; animation-delay: 3s; }
+        .star:nth-child(4) { top: 30%; left: 60%; animation-delay: 4.5s; }
+        .star:nth-child(5) { top: 90%; left: 10%; animation-delay: 6s; }
+        .star:nth-child(6) { top: 5%; left: 90%; animation-delay: 2.2s; }
+        .star:nth-child(7) { top: 65%; left: 15%; animation-delay: 3.8s; }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0; transform: scale(0.5); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+    </style>
+</head>
+<body>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+    <div class="star"></div>
+
+    <div class="container">
+        <h1>404</h1>
+        <h2>¡Upss! Página no existente</h2>
+        <p>Parece que has tomado un camino equivocado. La página que buscas no está en este sector.</p>
+        <p style="font-size: 0.9em; margin-top: 30px; opacity: 0.7;">
+            Código de Error: **404**. Si persisten los problemas, contacta al administrador del sistema.
+        </p>
+    </div>
+
+    <script>
+        // URL de tu API de Apps Script
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzxB6bc9Q93aGVfH40OwH1D8jV0KydkhvLKBL6OysHJmYfypsnd_ulhHcufeoTKHbmS/exec'; 
+        // URL a la que se redirige si el estado es ACTIVO
+        const REDIRECT_URL = 'index.html'; 
+        
+        fetch(API_URL)
+            .then(response => {
+                // Si hay un error HTTP o de red, no hacemos nada. 
+                // Asumimos que si no podemos verificar, el estado de "Vencido" persiste
+                if (!response.ok) {
+                    console.error('Error HTTP al llamar a la API:', response.status);
+                    return; // Mantiene al usuario en la página de error por seguridad
+                }
+                return response.json();
+            })
+            .then(data => {
+                // *** LÓGICA CLAVE: Redirigir si NO está Vencido ***
+                // Si la API devuelve {"isExpired": false} (o sea, está ACTIVO/VIGENTE), redirigimos a index.html
+                if (data.isExpired === false) {
+                    console.log("Licencia ACTIVA nuevamente. Redirigiendo a la página principal.");
+                    window.location.replace(REDIRECT_URL); // Redirige a index.html
+                }
+                // Si data.isExpired es true, permanece en esta página de error (Vencido)
+            })
+            .catch(error => {
+                // Manejo de errores de conexión. Mantiene al usuario en la página de error.
+                console.error('Fallo en la verificación de la licencia:', error);
+            });
+    </script>
+    </body>
+</html>

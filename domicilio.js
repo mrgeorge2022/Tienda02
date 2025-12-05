@@ -26,6 +26,90 @@ async function cargarConfig() {
 
 let costoDomicilio = 0;
 
+// ===============================
+// 🛵 ANIMACIÓN DE LA MOTOCICLETA (NUEVO CÓDIGO)
+// ===============================
+
+let markerMoto = null;
+let animationInterval = null;
+const MOTO_ICON_URL = "iconos/moto.png"; // ⚠️ ¡Asegúrate de que esta ruta sea correcta!
+
+/**
+ * 🎨 Crea el ícono de la motocicleta.
+ */
+function crearIconoMoto() {
+  return L.icon({
+    iconUrl: MOTO_ICON_URL,
+    iconSize: [40, 40], // Ajusta el tamaño según tu imagen
+    iconAnchor: [20, 20], // El centro del ícono
+    popupAnchor: [0, -20],
+    className: "moto-marker", // Para CSS si lo necesitas
+  });
+}
+
+/**
+ * 🛵 Inicia la animación de la motocicleta a lo largo de la ruta.
+ * @param {Array<L.LatLng>} puntosRuta Array de coordenadas LatLng.
+ */
+function animarRuta(puntosRuta) {
+  // 1. Limpiar cualquier animación anterior
+  if (animationInterval) {
+    clearInterval(animationInterval);
+    animationInterval = null;
+  }
+  // Eliminar el marcador anterior si existe
+  if (markerMoto) {
+    map.removeLayer(markerMoto);
+    markerMoto = null;
+  }
+
+  if (puntosRuta.length < 2) return;
+
+  // 2. Crear el marcador de la moto en el punto de inicio (sede)
+  markerMoto = L.marker(tiendaCoords, {
+    icon: crearIconoMoto(),
+    zIndexOffset: 1000, // Para que esté siempre encima
+  }).addTo(map);
+
+  let indicePuntoActual = 0;
+  const velocidad = 15; // Velocidad de la animación (cuantos puntos saltar en cada paso)
+  const intervaloMs = 100; // Intervalo de tiempo para la actualización
+
+  // 3. Función de animación
+  animationInterval = setInterval(() => {
+    indicePuntoActual += velocidad;
+
+    if (indicePuntoActual >= puntosRuta.length) {
+      // 4. Detener la animación al llegar al final
+      clearInterval(animationInterval);
+      animationInterval = null;
+      // Posicionar la moto en el destino final
+      markerMoto.setLatLng(puntosRuta[puntosRuta.length - 1]); 
+      return;
+    }
+
+    const punto = puntosRuta[indicePuntoActual];
+    const puntoAnterior = puntosRuta[Math.max(0, indicePuntoActual - velocidad)];
+
+    // 5. Mover el marcador
+    markerMoto.setLatLng(punto);
+
+    // 6. Calcular la rotación (opcional: para que la moto mire en la dirección de viaje)
+    // NOTA: Para usar L.GeometryUtil.bearing, necesitas la librería leaflet-geometryutil.
+    // Si no la tienes, simplemente omite la rotación.
+    // Aquí se deja comentada la rotación para evitar errores de librería no incluida.
+    /*
+    if (typeof L.GeometryUtil !== 'undefined') {
+        const angulo = L.GeometryUtil.bearing(puntoAnterior, punto);
+        const iconElement = markerMoto.getElement();
+        if (iconElement) {
+            iconElement.style.transform += ` rotate(${angulo}deg)`;
+        }
+    }
+    */
+  }, intervaloMs);
+}
+
 // ================================
 // 🎨 ÍCONOS PERSONALIZADOS
 // ================================
@@ -382,53 +466,88 @@ async function detectarDireccion(lat, lon) {
 }
 
 // ================================
-// 🚗 CALCULAR RUTA Y COSTOS CON MÍNIMO Y RECARGO NOCTURNO
+// 🚗 CALCULAR RUTA Y COSTOS CON MÍNIMO Y RECARGO NOCTURNO (MODIFICADO)
 // ================================
 function calcularRutaYCostos(destino) {
-  if (routingControl) map.removeControl(routingControl);
+  if (routingControl) map.removeControl(routingControl);
 
-  routingControl = L.Routing.control({
-    waypoints: [L.latLng(tiendaCoords), L.latLng(destino)],
-    lineOptions: {
-      styles: [
-        { color: "rgba(255,255,255,0.25)", weight: 8 },
-        { color: "#007bff", weight: 5, opacity: 0.8 },
-      ],
-    },
-    addWaypoints: false,
-    draggableWaypoints: false,
-    createMarker: () => null,
-    show: false,
-  })
-    .on("routesfound", (e) => {
-      const distanciaKm = e.routes[0].summary.totalDistance / 1000;
-      let costoBase = distanciaKm * 2500;
+    // 🧹 Limpia cualquier animación anterior antes de empezar una nueva ruta
+    document.getElementById('map').classList.remove('route-pulsing'); 
 
-      // 🕒 Hora real
-      const hora = new Date().getHours();
-      let recargoTexto = "";
-      let recargo = 0;
+  routingControl = L.Routing.control({
+    waypoints: [L.latLng(tiendaCoords), L.latLng(destino)],
+    lineOptions: {
+      styles: [
+        { color: "rgba(255,255,255,0.25)", weight: 8 },
+        { color: "#007bff", weight: 5, opacity: 0.8 },
+      ],
+    },
+    addWaypoints: false,
+    draggableWaypoints: false,
+    createMarker: () => null,
+    show: false,
+  })
+    .on("routesfound", (e) => {
+        // 🚨 ACTIVA LA ANIMACIÓN DE LA LUZ INTERMITENTE
+        document.getElementById('map').classList.add('route-pulsing'); 
+        
+        // OBTENEMOS LA RUTA Y LOS LÍMITES
+        const ruta = e.routes[0];
+        const distanciaKm = ruta.summary.totalDistance / 1000;
 
-      // 1️⃣ Redondear al siguiente cien y mínimo 3000
-      costoBase = Math.max(redondearACien(costoBase), 3000);
+        // 🎯 CÓDIGO CLAVE PARA CENTRAR Y ESCALAR LA RUTA:
+        // 1. Obtener los límites geográficos de la ruta
+        const bounds = ruta.coordinates.reduce((acc, coord) => {
+            return acc.extend(coord);
+        }, L.latLngBounds([ruta.coordinates[0]]));
 
-      // 2️⃣ Aplicar recargo nocturno sobre el valor ya redondeado
-      if (hora >= 22 || hora < 6) {
-        recargo = costoBase * 0.2; // +20%
-        recargoTexto = " (+20%)";
-      }
+        // 2. Calcular el padding (relleno) para compensar los DIVs flotantes
+        const panelTotales = document.getElementById('panel-totales');
+        const overlay = document.querySelector('.overlay');
 
-      // 3️⃣ Sumar recargo y redondear de nuevo al siguiente cien
-      costoDomicilio = redondearACien(costoBase + recargo);
+        // Obtenemos la altura real de los elementos, si existen. Usamos un valor por defecto si no.
+        const paddingBottom = panelTotales ? panelTotales.offsetHeight : 150;
+        const paddingTop = overlay ? overlay.offsetHeight : 100;
 
-      // Actualizar la UI
-      actualizarCostos(recargoTexto, hora);
+        // 3. Ajustar la vista del mapa con el padding calculado
+        map.fitBounds(bounds, {
+            paddingTopLeft: [10, paddingTop + 20],   // Ajuste para el overlay superior
+            paddingBottomRight: [10, paddingBottom + 20], // Ajuste para el panel inferior
+            maxZoom: 14 // Opcional: Evita un zoom demasiado cerca si la ruta es muy corta
+        });
+        // ----------------------------------------------------
+        
+        let costoBase = distanciaKm * 2500;
+
+      // 🕒 Hora real
+      const hora = new Date().getHours();
+      let recargoTexto = "";
+      let recargo = 0;
+
+      // 1️⃣ Redondear al siguiente cien y mínimo 3000
+      costoBase = Math.max(redondearACien(costoBase), 3000);
+
+      // 2️⃣ Aplicar recargo nocturno sobre el valor ya redondeado
+      if (hora >= 22 || hora < 6) {
+        recargo = costoBase * 0.2; // +20%
+        recargoTexto = " (+20%)";
+      }
+
+      // 3️⃣ Sumar recargo y redondear de nuevo al siguiente cien
+      costoDomicilio = redondearACien(costoBase + recargo);
+
+      // Actualizar la UI
+      actualizarCostos(recargoTexto, hora);
+    })
+    // 🧹 Limpia la animación si la ruta falla o se cancela
+    .on("routeabort", () => {
+        document.getElementById('map').classList.remove('route-pulsing');
     })
-    .addTo(map);
+    .addTo(map);
 
-  const style = document.createElement("style");
-  style.innerHTML = `.leaflet-routing-container { display: none !important; }`;
-  document.head.appendChild(style);
+  const style = document.createElement("style");
+  style.innerHTML = `.leaflet-routing-container { display: none !important; }`;
+  document.head.appendChild(style);
 }
 
 // 💰 ACTUALIZAR COSTOS con recargo y hora real
@@ -618,12 +737,32 @@ function closeCustomerModal() {
 }
 
 // ================================
-// 🗺️ Inicialización
+// 📣 MOSTRAR ALERTA DE UBICACIÓN AL INICIO
+// ================================
+function mostrarAlertaInicial() {
+  const alertEl = document.getElementById("location-alert");
+
+  if (!alertEl) return; // Si no existe el elemento, no hace nada
+
+  // Ocultar la alerta después de 3 segundos (3000 milisegundos)
+  setTimeout(() => {
+    alertEl.classList.add("hidden");
+    // Opcionalmente, puedes eliminar el elemento del DOM después de la transición
+    // setTimeout(() => { alertEl.remove(); }, 500); 
+  }, 3000);
+}
+
+
+// ================================
+// 🗺️ Inicialización (CÓDIGO CORREGIDO)
 // ================================
 window.addEventListener("DOMContentLoaded", async () => {
   await cargarConfig(); // primero carga el JSON
   initMap(); // luego inicializa el mapa
   actualizarCostos(); // finalmente actualiza los costos
+  
+  // 🎯 ¡Llamada agregada! Esto inicia el temporizador de 3 segundos.
+  mostrarAlertaInicial(); 
 });
 
 //boton de localicacion automatica en una posicion buena

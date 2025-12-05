@@ -2185,45 +2185,129 @@ select {
     color: #333;
 }
 
-/* Botón de ubicación */
+/* ------------------------------------------- */
+/* 🧭 BOTÓN DE UBICACIÓN Y ALERTA (MODIFICADO) */
+/* ------------------------------------------- */
+
+/* 🧭 Botón de ubicación */
 .locate-btn {
-    position: fixed;
-    /* se moverá con JS */
+    /* 1. Establece RELATIVE: CLAVE para posicionar la alerta ABSOLUTA dentro */
+    position: relative; 
+    
+    /* 2. Luego, anula el RELATIVE y fija la posición en la pantalla (comportamiento original) */
+    position: fixed; 
+
+    /* TUS ESTILOS ORIGINALES */
     right: 20px;
     z-index: 1000;
     
-    /* 💡 Aceleración GPU (CRÍTICO para "position: fixed") */
+    /* 💡 Aceleración GPU */
     transform: translateZ(0); 
     will-change: transform;
 
     /* Diseño */
-    background: #999;
+    background: #1E88E5;
     border: none;
-    border-radius: 50%;
-    width: 55px;
-    height: 55px;
+    
+    /* 🎯 CAMBIO CLAVE 1: Usamos un radio fijo para el modo 'pastilla' (expandido) */
+    border-radius: 25px;
+    
+    /* Permite que el botón crezca con el texto */
+    width: auto; 
+    height: auto;
+    /* Mantiene el tamaño mínimo del ícono (35px + 10px*2 padding = 55px) */
+    min-width: 30px; 
+    padding: 10px; 
+    gap: 10px;
     font-size: 26px;
     color: white;
     cursor: pointer;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    
+    /* 🎯 CAMBIO CLAVE: Usa Flex para alinear imagen y texto */
     display: flex;
     align-items: center;
-    justify-content: center;
-    transition: all 0.25s ease;
+    justify-content: flex-start; /* Alinea los elementos al inicio */
+    
+    /* Transiciona el ancho y el border-radius */
+    transition: all 0.7s ease; 
     
     /* Filtro por defecto (para escritorio) */
     backdrop-filter: blur(4px);
 }
 
+/* 🎯 CAMBIO CLAVE 3: Cuando el botón contiene el texto oculto, se vuelve círculo */
+.locate-btn:has(> .hidden) {
+    gap: 0px;
+    border-radius: 30px; /* Fuerza la forma circular */
+    /* 🎯 CORRECCIÓN: Sobrescribe la transición de 'border-radius'. Dura 0s (es instantáneo) 
+       y espera 0.7s (el tiempo de la animación de encogimiento). Esto asegura que el 
+       redondeo se aplica SOLO cuando el botón ya está encogido, eliminando el óvalo intermedio. */
+    transition: border-radius 0s linear 0.7s, all 0.7s ease;
+}
+
+.locate-btn img {
+    width: 25px;
+    height: 25px;
+    object-fit: contain;
+    pointer-events: none;
+    /* Añadimos un margen derecho para separar la imagen del texto */
+}
+
+
+/* 📢 ESTILOS DE LA ALERTA TEMPORAL CON ANIMACIÓN CLIP-PATH (PAC-MAN) */
+.location-alert-text {
+    /* ❌ ELIMINAMOS POSICIONAMIENTO ABSOLUTO Y RIGHT FIJO (es flex item) */
+    position: static; 
+    right: auto; 
+    top: auto;
+    transform: none; 
+    
+    /* Apariencia */
+    padding: 2px 0; 
+    background-color: transparent; 
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    border-radius: 0; 
+    box-shadow: none; 
+    white-space: nowrap;
+    z-index: 999; 
+    
+    /* Establecemos un ancho máximo para poder hacer la transición a 0 */
+    max-width: 300px; 
+    overflow: hidden;
+    
+    /* CONTROL DE ANIMACIÓN (CLAVE) */
+    
+    /* 1. Estado inicial: visible (clip-path cubre el 100% del elemento) */
+    clip-path: inset(0% 0% 0% 0%); 
+    
+    /* 2. Transición: Animamos clip-path, opacidad y el ancho máximo (para encoger el botón) */
+    transition: clip-path 0.7s ease-in-out, opacity 0.7s ease-in-out, max-width 0.7s ease-in-out; 
+    
+    pointer-events: none; 
+}
+
+/* Clase para ocultar (usada por JavaScript) */
+.location-alert-text.hidden {
+    /* 🎯 Efecto de Pac-Man: Se cierra el área visible de izquierda a derecha (hacia el botón) */
+    /* clip-path: inset(Top Right Bottom Left) */
+    /* Cerramos el borde derecho al 100% para simular que el botón lo oculta */
+    clip-path: inset(0% 0% 0% 100%); 
+    
+    /* Reducimos la opacidad para un cierre suave */
+    opacity: 0;
+    
+    /* 🎯 CAMBIO CLAVE para forzar el encogimiento del botón padre y que vuelva a ser redondo */
+    max-width: 0; 
+    /* Hacemos que la imagen se pegue al borde derecho quitando su margen */
+}
 /* === OPTIMIZACIÓN MÓVIL (< 600px) === */
 @media (max-width: 600px) {
     .locate-btn {
         /* ❌ ELIMINAR EL FILTRO CARO EN MÓVIL */
         backdrop-filter: none;
-        
-        /* Reemplazar el fondo con un color RGBA eficiente */
-        /* Usamos el color base (#999) con una ligera transparencia (0.95) */
-        background: rgba(153, 153, 153, 0.95); 
     }
 }
 
@@ -2234,6 +2318,33 @@ select {
     pointer-events: none;
 }
 
+/* ================================ */
+/* 💡 EFECTO LUZ INTERMITENTE EN RUTA */
+/* ================================ */
+
+/* 1. Definición de la animación pulsante */
+@keyframes pulse-route {
+  0% {
+    /* Estado inicial: Sombra transparente */
+    filter: drop-shadow(0 0 0 rgba(255, 255, 0, 0.0)); 
+  }
+  50% {
+    /* Estado máximo: Sombra brillante (luz neón) */
+    filter: drop-shadow(0 0 10px #1E88E5); /* Amarillo brillante */
+  }
+  100% {
+    /* Vuelve al estado inicial */
+    filter: drop-shadow(0 0 0 rgba(255, 255, 0, 0.0));
+  }
+}
+
+/* 2. Clase que aplica la animación a la línea de la ruta (SVG) */
+/* La ruta de Leaflet es un elemento SVG <path> dentro del contenedor del mapa */
+.route-pulsing .leaflet-routing-alt-line,
+.route-pulsing path.leaflet-interactive {
+    /* Aplica la animación */
+    animation: pulse-route 1.5s infinite ease-in-out; /* 1.5s de duración, se repite */
+}
 
 .panel .linea {
     display: flex;

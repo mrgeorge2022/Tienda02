@@ -7,8 +7,8 @@
   <link id="favicon" rel="icon" type="image/png" href="">
   <style>
     :root {
-      --bg-body: linear-gradient(135deg, #fafafa, #eceff1);
-      --card-bg: #ffffff;
+--bg-body: #1e1e2d;      
+--card-bg: #ffffff;
       --muted: #616161;
       --text-color: #212121;
       --textarea: #f9f9f9;
@@ -38,7 +38,7 @@
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--bg-body);
       color: var(--text-color);
-      padding: 1rem;
+      padding: 10px 5px 10px 5px;
       min-height: 100vh;
     }
 
@@ -51,15 +51,15 @@
     }
 
     .header img {
-      width: 45px;
-      height: 45px;
+      width: 35px;
+      height: 35px;
       object-fit: contain;
     }
 
     .header h1 {
       font-size: 2.2rem;
       font-weight: 700;
-      color: var(--text-color);
+      color: #fff;
       text-align: center;
       letter-spacing: 0.5px;
     }
@@ -218,7 +218,7 @@
     /* Flechas de Scroll (MODIFICADO) */
     .scroll-arrow {
         background: none; /* Fondo oscuro */
-        color: var(--text-color);
+        color: #666;
         border: none;
         padding: 10px; /* Más padding para que se pueda pulsar mejor */
         cursor: pointer;
@@ -242,7 +242,7 @@
     #lista-pedidos {
       display: flex;
       flex-wrap: nowrap;
-      gap: 1.5rem;
+      gap: 0.5rem;
       overflow-x: auto;
       padding: 1rem 0;
       scroll-behavior: smooth; 
@@ -255,22 +255,66 @@
      display: auto ;
 }
 
-    /* ===== PEDIDO (TICKET LOOK) ===== */
-    .pedido {
-      flex: 0 0 auto;
-      width: 230px;
-      height: auto;
-      background: var(--card-bg);
-      border-radius: 14px;
-      padding: 1rem 1.2rem;
-      box-shadow: var(--soft-shadow);
-      border-left: 6px solid var(--text-color);
-      overflow-wrap: break-word;
-      transition: all 0.25s ease;
-      display: flex;
-      flex-direction: column;
-      position: relative;
-    }
+/*
+==================================================
+PEDIDO CON BORDE "SUBE Y BAJA" (SAWTOOTH/TICKET)
+==================================================
+*/
+.pedido {
+  flex: 0 0 auto;
+  width: 230px;
+  height: auto;
+  background: var(--card-bg);
+  
+  /* 1. ELIMINAR bordes dash originales */
+  border-top: none;
+  border-bottom: none;
+  
+  /* 2. AJUSTAR el padding vertical para acomodar el efecto de corte (18px ~ 1.125rem) */
+  padding: 0px 5px 18px 5px;
+  
+  box-shadow: var(--soft-shadow);
+  overflow-wrap: break-word;
+  transition: all 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  position: relative; /* ¡CRUCIAL! para los pseudo-elementos */
+}
+
+/* 3. Definimos los pseudo-elementos para el patrón de corte */
+.pedido::before,
+.pedido::after {
+  content: '';
+  position: absolute;
+  left: 0px; /* Empieza después de la barra lateral izquierda */
+  width: calc(100% - 0px); /* Cubre el ancho restante */
+  height: 10px; /* Altura del "diente" */
+  
+  
+  /* Usamos el color de fondo de la PÁGINA para que el corte sea visible */
+  background-color: var(--bg-body); 
+  background-size: 10px 10px; /* Tamaño del patrón: 20px de ancho por 10px de alto */
+  background-repeat: repeat-x;
+}
+
+/* Borde SUPERIOR: Dientes apuntando hacia arriba (corte que "muerde" el borde superior) */
+.pedido::before {
+  top: -10px;
+  /* Dibuja triángulos (mitad de 20px) del color de la tarjeta (--card-bg), 
+     y luego transparente para el corte */
+  background-image: 
+    linear-gradient(-45deg, var(--card-bg) 50%, transparent 50%),
+    linear-gradient(45deg, var(--card-bg) 50%, transparent 50%);
+}
+
+/* Borde INFERIOR: Dientes apuntando hacia abajo (corte que "muerde" el borde inferior) */
+.pedido::after {
+  bottom: -10px;
+  /* Dibuja triángulos invertidos para que las puntas queden abajo */
+  background-image: 
+    linear-gradient(-135deg, var(--card-bg) 50%, transparent 50%),
+    linear-gradient(135deg, var(--card-bg) 50%, transparent 50%);
+}
 
 
     /* ===== TIPO DE ENTREGA ===== */
@@ -280,7 +324,6 @@
       font-weight: 700;
       padding: 0.45rem 1rem;
       display: inline-block;
-      border-radius: 8px;
       color: #fff;
       font-size: 0.9rem;
       text-transform: uppercase;
@@ -300,18 +343,6 @@
       background: linear-gradient(45deg, #66bb6a, #81c784);
     }
 
-    /* ===== BORDES SEGÚN TIPO ===== */
-    .pedido.domicilio {
-      border-left: 6px solid var(--color-domicilio);
-    }
-
-    .pedido.mesa {
-      border-left: 6px solid var(--color-mesa);
-    }
-
-    .pedido.recoger {
-      border-left: 6px solid var(--color-recoger);
-    }
 
     /* ===== ENCABEZADO DE CADA PEDIDO ===== */
     .pedido-header {
@@ -335,6 +366,14 @@
       color: var(--muted);
       font-weight: 700;
       font-size: 15px;
+    }
+
+    .pedido-cliente{
+      text-align: center;
+    }
+
+    .pedido-mesa{
+      text-align: center;
     }
 
     /* ===== CONTENIDO ===== */
@@ -404,20 +443,17 @@
     }
 
     .pedido-observaciones span {
-      color: #d32f2f;
+      color: red;
       font-weight: 600;
     }
 
     /* ===== OBSERVACIONES ===== */
     .observaciones {
       margin-top: 10px;
-      color: #c62828;
+      color: red;
       font-size: 0.9rem;
-      font-weight: 500;
       background: #ffebee;
       padding: 0.5rem 0.6rem;
-      border-radius: 6px;
-      border-left: 4px solid #d32f2f;
     }
 
     /* ===== SIN PEDIDOS ===== */
@@ -481,6 +517,7 @@
       gap: 0.4rem;
       font-size: 0.95rem;
       font-weight: 500;
+      color: #fff;
     }
 
     .resumen-circulo {
@@ -497,15 +534,12 @@
 
 .btn-imprimir {
   /* Apariencia */
-  background: #999; /* Color principal azul/cian */
-  color: #fff;
+  background: #c5c5c5; /* Color principal azul/cian */
   border: none;
   padding: 2px;
   margin-top: 20px;
-  border-radius: 8px;
   cursor: pointer;
   font-size: 0.9rem;
-  font-weight: 600;
   width: 100%; /* Ocupa todo el ancho del pedido */
   text-align: center;
   transition: all 0.2s ease;
@@ -518,7 +552,7 @@
 }
 
 .btn-imprimir:hover {
-  background: #888; /* Un poco más claro al pasar el ratón */
+  background: #a5a4a4; /* Un poco más claro al pasar el ratón */
 }
 
 .btn-imprimir:active {
@@ -572,7 +606,7 @@
   <div class="fecha-container">
     <div id="fechabtn">
       <input type="date" id="fecha">
-      <button id="btn-recargar">🔄 Recargar</button>
+      <button id="btn-recargar">Recargar</button>
     </div>
 
     <div class="filter-switches" id="tipo-filtros">
@@ -628,6 +662,7 @@
       .catch(err => console.warn("No se pudo cargar config.json:", err));
   </script>
 
+<audio id="alerta-sonido" src="sonidos/cocina.mp3" preload="auto"></audio>
   <script src="cocina.js"></script>
   <script>
     document.getElementById("btn-recargar").addEventListener("click", () => {

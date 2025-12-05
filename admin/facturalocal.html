@@ -285,6 +285,7 @@
     }
     
     .print-actions #btn-close {
+      width: 90%;
         background: #ffe6e6;
         color: #cc0000;
         border-color: #cc0000;
@@ -315,7 +316,11 @@
       }
     }
   </style>
+</head>
 
+  <!-- Librerías para generar PDF desde HTML -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 </head>
 
@@ -413,6 +418,7 @@
 
     <div class="print-actions">
       <button id="btn-print">🖨️ Imprimir</button>
+      <button id="btn-savepdf">💾 Guardar PDF</button>
       <button id="btn-close">✖ Cerrar</button>
     </div>
   </div>
@@ -522,6 +528,11 @@
         window.location.href = 'pedidos.html';   
       });
 
+      // Guardar PDF: captura el elemento #page y genera un PDF con las mismas proporciones
+      document.getElementById('btn-savepdf').addEventListener('click', async () => {
+        await saveInvoicePdf();
+      });
+
       cargarConfig(); // 🔥 carga los datos de la sede
 
       // 🧭 Generación de QR (Adaptado al estilo POS)
@@ -553,6 +564,58 @@
 
 
     })();
+
+    async function saveInvoicePdf() {
+      const pageEl = document.getElementById('page');
+      const actions = document.querySelector('.print-actions');
+
+      // Eliminar temporalmente los botones del DOM antes de capturar
+      let actionsParent = null;
+      let actionsPlaceholder = null;
+      if (actions && actions.parentNode) {
+        actionsParent = actions.parentNode;
+        actionsPlaceholder = document.createComment('print-actions-placeholder');
+        actionsParent.replaceChild(actionsPlaceholder, actions);
+      }
+
+      // Pequeña espera para que el DOM se actualice
+      await new Promise(r => setTimeout(r, 150));
+
+      // Config html2canvas
+      const canvas = await html2canvas(pageEl, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false
+      });
+
+      // Restaurar el nodo de botones al DOM después de capturar
+      if (actions && actionsParent && actionsPlaceholder) {
+        actionsParent.replaceChild(actions, actionsPlaceholder);
+      }
+
+      // Convertir canvas a imagen
+      const imgData = canvas.toDataURL('image/jpeg', 1.0);
+
+      // Convertir px -> mm (asumiendo 96 DPI)
+      const pxToMm = 25.4 / 96;
+      const imgWidthMm = canvas.width * pxToMm;
+      const imgHeightMm = canvas.height * pxToMm;
+
+      // Usar jsPDF con tamaño de página igual al del contenido para evitar recortes
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({ unit: 'mm', format: [imgWidthMm, imgHeightMm] });
+
+      // Añadir la imagen ocupando toda la página
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidthMm, imgHeightMm, undefined, 'FAST');
+
+      // Nombre de archivo con número de factura y fecha
+      const factura = document.getElementById('factura-num').textContent || 'factura';
+      const fecha = new Date().toISOString().slice(0,19).replace(/[:T]/g,'-');
+      const filename = `${factura}_${fecha}.pdf`;
+
+      pdf.save(filename);
+    }
   </script>
 </body>
 
