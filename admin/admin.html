@@ -1,170 +1,229 @@
 <!DOCTYPE html>
 <html lang="es">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Panel Administrativo</title>
-    <link rel="icon" type="image/png" href="../img/icono_tienda.png">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    
+    <link rel="icon" type="image/png" href="../img/icono_tienda.png" />
+
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
     <style>
-        /* ================================\
+      /* ================================\
            VARIABLES / RESET (Estilo de estadísticas.html)
            ================================ */
-        :root {
-            --primary: #5bc0de;
-            --accent: #46b8da;
-            --muted: #909ba7;
-            --success: #63d471;
-            --warning: #f8c050;
-            --danger: #ff6b6b;
-            --bg: #1e1e2d; /* Fondo oscuro */
-            --card: #2b2b3f; /* Color de tarjeta oscura */
-            --line: #4a4a68;
-            --text: #f1f1f1; /* Texto claro */
-            --input: #3c3c50;
-            --shadow: rgba(0, 0, 0, 0.25);
-        }
+      :root {
+        --primary: #5bc0de;
+        --accent: #46b8da;
+        --muted: #909ba7;
+        --success: #63d471;
+        --warning: #f8c050;
+        --danger: #ff6b6b;
+        --bg: #1e1e2d; /* Fondo oscuro */
+        --card: #2b2b3f; /* Color de tarjeta oscura */
+        --line: #4a4a68;
+        --text: #f1f1f1; /* Texto claro */
+        --input: #3c3c50;
+        --shadow: rgba(0, 0, 0, 0.25);
+      }
 
-        body {
-            font-family: "Inter", sans-serif;
-            background: var(--bg);
-            margin: 0;
-            padding: 1rem;
-            color: var(--text);
-            min-height: 100vh;
-        }
+      body {
+        font-family: "Inter", sans-serif;
+        background: var(--bg);
+        margin: 0;
+        padding: 1rem;
+        color: var(--text);
+        min-height: 100vh;
+        /* Agregamos transición para un efecto de carga suave */
+        transition: opacity 0.5s ease-in-out;
+      }
 
-        /* HEADER */
-        header {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-top: 10px;
-        }
+      /* HEADER */
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+        padding-top: 10px;
+      }
 
-        h1 {
-            margin: 0;
-            color: var(--text);
-            font-size: 2rem;
-            font-weight: 800;
-        }
+      h1 {
+        margin: 0;
+        color: var(--text);
+        font-size: 2rem;
+        font-weight: 800;
+      }
 
-        header p {
-            color: var(--muted);
-            font-size: 1rem;
-        }
+      header p {
+        color: var(--muted);
+        font-size: 1rem;
+      }
 
-        /* MENÚ GRID */
+      /* MENÚ GRID */
+      .menu {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto 40px;
+      }
+
+      /* CARDS */
+      .card {
+        background: var(--card);
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: 0 4px 12px var(--shadow);
+        cursor: pointer;
+        border: 1px solid var(--line);
+        transition: transform 0.2s ease, box-shadow 0.2s ease,
+          border-color 0.2s ease;
+      }
+
+      .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px var(--shadow);
+        border-color: var(--primary); /* Resaltar al pasar el ratón */
+      }
+
+      .card h2 {
+        font-size: 1.5rem;
+        color: var(--primary); /* Color principal para títulos */
+        margin: 10px 0 6px;
+        font-weight: 600;
+      }
+
+      .card p {
+        font-size: 1rem;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      /* FOOTER */
+      footer {
+        margin-top: auto; /* Empuja el footer hacia abajo */
+        padding: 20px 0;
+        text-align: center;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      /* MEDIA QUERIES para tablet/mobile */
+      @media (max-width: 600px) {
         .menu {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            max-width: 1200px;
-            margin: 0 auto 40px;
+          grid-template-columns: 1fr;
+          gap: 15px;
         }
-
-        /* CARDS */
-        .card {
-            background: var(--card);
-            border-radius: 12px;
-            padding: 25px;
-            text-align: center;
-            box-shadow: 0 4px 12px var(--shadow);
-            cursor: pointer;
-            border: 1px solid var(--line);
-            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        body {
+          padding: 0.5rem;
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px var(--shadow);
-            border-color: var(--primary); /* Resaltar al pasar el ratón */
-        }
-
-        .card h2 {
-            font-size: 1.5rem;
-            color: var(--primary); /* Color principal para títulos */
-            margin: 10px 0 6px;
-            font-weight: 600;
-        }
-
-        .card p {
-            font-size: 1rem;
-            color: var(--muted);
-            margin: 0;
-        }
-
-        /* FOOTER */
-        footer {
-            margin-top: auto; /* Empuja el footer hacia abajo */
-            padding: 20px 0;
-            text-align: center;
-            font-size: 0.85rem;
-            color: var(--muted);
-        }
-
-        /* MEDIA QUERIES para tablet/mobile */
-        @media (max-width: 600px) {
-            .menu {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            body {
-                padding: 0.5rem;
-            }
-        }
+      }
     </style>
-</head>
 
-<body>
+    <script>
+      // 🚨 CAMBIO HECHO: La ruta ahora es '../config.json' para buscarlo en el directorio padre
+      const CONFIG_FILE_URL = "../config.json";
+      const REDIRECT_URL = "../noencontrada.html?from=admin/admin.html";
+
+      // Función para manejar la redirección en caso de error o vencimiento
+      function redirectOnError(error) {
+        console.error(
+          "Fallo en la verificación. Redirigiendo a la página de error:",
+          error
+        );
+        window.location.replace(REDIRECT_URL);
+        // Lanzamos un error para detener cualquier promesa pendiente
+        throw new Error("Redirección ejecutada");
+      }
+
+      // Función Asíncrona Invocada Inmediatamente (IIFE)
+      (async function checkLicenseAndLoad() {
+        try {
+          // 1. Cargar el archivo de configuración
+          const configResponse = await fetch(CONFIG_FILE_URL);
+          if (!configResponse.ok) {
+            redirectOnError(
+              `Error HTTP al cargar ${CONFIG_FILE_URL}: ${configResponse.status}`
+            );
+          }
+          const config = await configResponse.json();
+
+          // 2. Obtener la URL de la API de licencia
+          const API_URL = config.apiUrls.licencia;
+
+          // 3. Llamar a la API de verificación de licencia
+          const apiResponse = await fetch(API_URL);
+          if (!apiResponse.ok) {
+            redirectOnError(
+              `Error HTTP al llamar a la API de Licencia: ${apiResponse.status}`
+            );
+          }
+          const data = await apiResponse.json();
+
+          // 4. Verificar el estado de la licencia
+          if (data.isExpired === true) {
+            console.warn("Licencia VENCIDA. Redirigiendo...");
+            window.location.replace(REDIRECT_URL);
+            return; // Detener la ejecución
+          }
+
+          // 5. SI TODO ESTÁ BIEN: Mostrar el contenido de la web
+          document.body.style.opacity = 1; // Hace visible el body
+          console.log("Licencia ACTIVA. Panel cargado.");
+        } catch (error) {
+          // Si el error no es de redirección (ya gestionado), lo manejamos
+          if (error.message !== "Redirección ejecutada") {
+            redirectOnError(error);
+          }
+        }
+      })();
+    </script>
+  </head>
+
+  <body style="opacity: 0">
     <header>
-        <h1>⚙️ Panel Administrativo</h1>
-        <p>Controla tu todo desde un solo lugar</p>
+      <h1>⚙️ Panel Administrativo</h1>
+      <p>Controla tu todo desde un solo lugar</p>
     </header>
 
-<section class="menu">
-
-    <!-- 1 - Operación en vivo -->
-    <div class="card" onclick="location.href='pedidos.html'">
+    <section class="menu">
+      <div class="card" onclick="location.href='pedidos.html'">
         <h2>📦 Pedidos</h2>
         <p>Ver pedidos en tiempo real</p>
-    </div>
+      </div>
 
-    <!-- 2 - Dinero / cierre -->
-    <div class="card" onclick="location.href='cierre_caja.html'">
+      <div class="card" onclick="location.href='cierre_caja.html'">
         <h2>💰 Caja</h2>
         <p>Registra y concilia el día</p>
-    </div>
+      </div>
 
-    <!-- 3 - Gestión del negocio -->
-    <div class="card" onclick="location.href='productos.html'">
+      <div class="card" onclick="location.href='productos.html'">
         <h2>🛒 Productos</h2>
         <p>Lista y control de artículos</p>
-    </div>
+      </div>
 
-    <!-- 4 - Análisis -->
-    <div class="card" onclick="location.href='estadisticas.html'">
+      <div
+        class="card"
+        onclick="alert('PROXIMAMENTE (Funcionalidad en desarrollo)')"
+        style="opacity: 40%"
+      >
+        <h2>📋 Inventario</h2>
+        <p>Controla todo tu stock</p>
+      </div>
+
+      <div class="card" onclick="location.href='estadisticas.html'">
         <h2>📊 Estadísticas</h2>
         <p>Resumen de ventas y desempeño</p>
-    </div>
+      </div>
 
-    <!-- 5 - Configuración -->
-    <div class="card" onclick="location.href='horarios.html'">
+      <div class="card" onclick="location.href='horarios.html'">
         <h2>🕒 Horarios</h2>
         <p>Configura apertura y cierre</p>
-    </div>
-
-<!-- 6 - Inventario -->
-<div class="card" onclick="alert('PROXIMAMENTE (Funcionalidad en desarrollo)')">
-    <h2>📋 Stock</h2>
-    <p>Controla todo tu inventario</p>
-</div>
-
-</section>
+      </div>
+    </section>
 
     <footer>Desarrollado con ❤️ para tu negocio</footer>
-</body>
-
+  </body>
 </html>

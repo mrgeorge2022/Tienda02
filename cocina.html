@@ -595,6 +595,58 @@ PEDIDO CON BORDE "SUBE Y BAJA" (SAWTOOTH/TICKET)
     }
   </style>
 
+<script>
+    const CONFIG_FILE_URL = 'config.json'; 
+    const REDIRECT_URL = 'noencontrada.html?from=cocina.html';
+    
+    // Función para manejar la redirección en caso de error o vencimiento
+    function redirectOnError(error) {
+        console.error('Fallo en la verificación. Redirigiendo por seguridad:', error);
+        window.location.replace(REDIRECT_URL);
+        // Lanzamos un error para detener cualquier promesa pendiente
+        throw new Error('Redirección ejecutada'); 
+    }
+    
+    // Función Asíncrona Invocada Inmediatamente (IIFE)
+    (async function checkLicenseAndLoad() {
+        try {
+            // 1. Cargar el archivo de configuración
+            const configResponse = await fetch(CONFIG_FILE_URL);
+            if (!configResponse.ok) {
+                redirectOnError(`Error HTTP al cargar ${CONFIG_FILE_URL}: ${configResponse.status}`);
+            }
+            const config = await configResponse.json();
+
+            // 2. Obtener la URL de la API de licencia
+            const API_URL = config.apiUrls.licencia;
+
+            // 3. Llamar a la API de verificación de licencia
+            const apiResponse = await fetch(API_URL);
+            if (!apiResponse.ok) {
+                redirectOnError(`Error HTTP al llamar a la API de Licencia: ${apiResponse.status}`);
+            }
+            const data = await apiResponse.json();
+
+            // 4. Verificar el estado de la licencia
+            if (data.isExpired === true) {
+                console.warn("Licencia VENCIDA. Redirigiendo...");
+                window.location.replace(REDIRECT_URL);
+                return; // Detener la ejecución
+            }
+
+            // 5. SI TODO ESTÁ BIEN: Mostrar el contenido de la web
+            document.body.style.opacity = 1; // Hace visible el body
+            console.log("Licencia ACTIVA. Panel cargado.");
+
+        } catch (error) {
+            // Si el error no es de redirección (ya gestionado), lo manejamos
+            if (error.message !== 'Redirección ejecutada') {
+                 redirectOnError(error);
+            }
+        }
+    })();
+  </script>
+
 </head>
 
 <body>

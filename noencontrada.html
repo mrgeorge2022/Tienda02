@@ -117,26 +117,31 @@
 
 <div class="container">
         <h1 id="main-title">404</h1>
-        <h2 id="service-status">Servicio Temporalmente No Disponible</h2>
+        <h2 id="service-status">Servicio  No Disponible</h2>
         
         <p id="error-message-text">
-            No pudimos establecer conexión con el servidor.
+            No se pudo establecer conexión con el servidor. Por favor, comuníquese con el administrador del sistema.
         </p>
         
         <p id="subtext" style="font-size: 0.9em; margin-top: 30px; opacity: 0.7;">
-            Verificando el estado del servicio. Próximo intento en <span id="countdown">30</span> segundos.
-        </p>
+         Verificando el estado del servicio. Próximo intento automático en <span id="countdown">30</span> segundo(s).
+         </p>
+
         
         <div id="retry-button-container"></div>
     </div>
 
-    <script>
+   <script>
         // ARCHIVOS Y CONSTANTES
         const CONFIG_FILE_URL = 'config.json';
-        const REDIRECT_URL = 'index.html'; 
         const CHECK_INTERVAL = 30000; // 30 segundos
         const COUNTDOWN_TIME = CHECK_INTERVAL / 1000; // 30 segundos
         
+        // 🚨 CAMBIO CLAVE: Determinar la URL final de redirección
+        const urlParams = new URLSearchParams(window.location.search);
+        // Obtiene el valor del parámetro 'from'. Por defecto, usa 'index.html' si no se encuentra.
+        const FINAL_REDIRECT_URL = urlParams.get('from') || 'index.html'; 
+
         // ELEMENTOS DEL DOM
         const container = document.getElementById('retry-button-container');
         const serviceStatus = document.getElementById('service-status');
@@ -153,16 +158,16 @@
         function displayButton() {
             serviceStatus.innerHTML = "¡Conexión Restablecida!";
             errorText.innerHTML = "El servicio está disponible. Haz clic para ingresar.";
-            subText.style.display = 'none'; // Oculta el contador y el mensaje de chequeo
+            subText.style.display = 'none'; 
             maintitle.style.display = 'none';
 
             clearInterval(checkIntervalId);
             clearInterval(countdownIntervalId);
 
-            // Inyectar el botón clickable (única forma de salir de esta página)
+            // Inyectar el botón clickable
             container.innerHTML = `
-                <button class="retry-button" onclick="window.location.replace(REDIRECT_URL)">
-                    Ingresar Ahora
+                <button class="retry-button" onclick="window.location.replace(FINAL_REDIRECT_URL)">
+                    Ir al sitio
                 </button>
             `;
         }
@@ -174,19 +179,17 @@
 
             countdownIntervalId = setInterval(() => {
                 timeLeft--;
-                countdownElement.textContent = timeLeft; // 🚨 ESTO ACTUALIZA EL NÚMERO VISIBLE
+                countdownElement.textContent = timeLeft; 
 
                 if (timeLeft <= 0) {
                     clearInterval(countdownIntervalId);
-                    // La función checkLicenseStatus se llamará automáticamente por el checkIntervalId principal.
                 }
-            }, 1000); // 🚨 Se ejecuta cada 1 segundo
+            }, 1000); 
         }
 
 
         // FUNCIÓN PRINCIPAL DE CHEQUEO
         async function checkLicenseStatus() {
-            // Detener el contador anterior antes de iniciar el chequeo (para que no siga contando durante el fetch)
             clearInterval(countdownIntervalId);
 
             // 1. Cargar la configuración
@@ -223,7 +226,7 @@
                     errorText.innerHTML = "No pudimos establecer conexión con el servidor.";
                     subText.style.display = 'block';
                     
-                    startCountdown(); // Iniciar el tictac (30 -> 0)
+                    startCountdown(); 
                 }
                 
             } catch (error) {
@@ -233,7 +236,7 @@
                 errorText.innerHTML = "Hubo un error al intentar verificar el servicio.";
                 subText.style.display = 'block';
                 
-                startCountdown(); // Iniciar el tictac (30 -> 0)
+                startCountdown(); 
             }
         }
 
