@@ -44,14 +44,12 @@
 
             // 4. Verificar el estado de la licencia
             if (data.isExpired === true) {
-                console.warn("Licencia VENCIDA. Redirigiendo...");
                 window.location.replace(REDIRECT_URL);
                 return; // Detener la ejecución
             }
 
             // 5. SI TODO ESTÁ BIEN: Mostrar el contenido de la web
             document.body.style.opacity = 1;
-            console.log("Licencia ACTIVA. Contenido cargado.");
 
         } catch (error) {
             // Si el error no es de redirección (ya gestionado), lo manejamos
@@ -68,7 +66,7 @@
     <div class="header">
       <div class="header-left">
         <a href="index.html">
-          <img src="" alt="Logo del restaurante" class="header-logo">
+          <img src="" alt="Logo" class="header-logo">
         </a>
         <div class="header-info">
           <h1></h1>
@@ -405,7 +403,7 @@
     </div>
 
     <div class="footer-qr">
-      <img src="" alt="QR Mr. George">
+      <img src="" alt="QR">
     </div>
 
   <div class="footer-branches">
@@ -420,7 +418,7 @@
 
   <div class="footer-content">
     <div>
-      <img src="" alt="Logo del restaurante" class="footer-logo">
+      <img src="" alt="Logo" class="footer-logo">
     </div>
 
 <div class="create-store">
